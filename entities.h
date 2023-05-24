@@ -5,7 +5,7 @@
 struct Message {
     QString nickname;
     QString text;
-    QTime time;
+    QDateTime time;
     QString id;
     bool deleted;
 

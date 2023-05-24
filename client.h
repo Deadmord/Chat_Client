@@ -17,7 +17,7 @@ public:
     const QString& getHostName();
     quint16 getPort();
     quint16 getRoomNum();
-    const QTime& getLastMessageTime();
+    const QDateTime& getLastMessageTime();
 
     //---------setters-----------
     void setUserName(QString userName);
@@ -39,7 +39,7 @@ private:
     quint16 port = 0;
     quint16 roomNum = 0;
 
-    QTime lastMessageTime;
+    QDateTime lastMessageTime;
 
 };
 
