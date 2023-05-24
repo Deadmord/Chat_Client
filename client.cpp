@@ -3,7 +3,7 @@
 Client::Client(QString &userName, QString &hostName, quint16 port, quint16 roomNum)
     :userName(userName), hostName(hostName), port(port), roomNum(roomNum)
 {
-    lastMessageTime = QTime();
+    lastMessageTime = QDateTime();
 }
 
 Client::~Client()
@@ -12,7 +12,7 @@ Client::~Client()
 }
 
 //------------getters-----------
-const QString& Client::getUserName() {return userName;}  //не напутал ли я тут с возвращаемым типом?
+const QString& Client::getUserName() {return userName;}
 
 const QString &Client::getHostName() {return hostName;}
 
@@ -20,7 +20,7 @@ quint16 Client::getPort() {return port;}
 
 quint16 Client::getRoomNum() {return roomNum;}
 
-const QTime &Client::getLastMessageTime() {return lastMessageTime;}
+const QDateTime &Client::getLastMessageTime() {return lastMessageTime;}
 
 //------------setters-----------
 void Client::setUserName(QString userName)
@@ -45,6 +45,6 @@ void Client::setRoomNum(quint16 roomNum)
 
 void Client::setLastMessageTime()
 {
-    this->lastMessageTime = QTime::currentTime();
+    this->lastMessageTime = QDateTime::currentDateTime();
 }
 

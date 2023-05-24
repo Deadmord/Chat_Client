@@ -1,4 +1,4 @@
-#include "ChatClient.h"
+п»ї#include "ChatClient.h"
 
 ChatClient::ChatClient(Client& client, QWidget *parent)
     : QMainWindow(parent)
@@ -27,7 +27,7 @@ void ChatClient::slotReadyRead()
         //        ui->textBrowser->append(str);
         for (;;)
         {
-            //похоже что нужно выносить в отдельный поток этот цикл, т.к. ожидание
+            //ToDo: looks like it sould be in separate thread, couse a waiting
             if (nextBlockSize == 0)
             {
                 if (socket->bytesAvailable() < 2)
@@ -40,12 +40,12 @@ void ChatClient::slotReadyRead()
             {
                 break;
             }
-            //очевидно что условие выше выводит из цикла for, но как мы попадаем сюда снова? получается in.status обновляет значение после выполнения строки ниже?
+            //strange conditionР± warning
             Message msg;
             in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
 
             nextBlockSize = 0;
-            if (!msg.deleted)                //TODO сделать функцию вывода сообщения в окно чата
+            if (!msg.deleted)                //TODO Create printmessage function
             {
                 ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
             }
@@ -69,16 +69,16 @@ void ChatClient::sendToServer(Message msg)
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
 
-    out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // преобразовали в stream (ToDo определить << и >> для Message)
+    out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // ToDo: define operators << and >> for "Messege"
 
-    out.device()->seek(0);          //переходим в начало "данных"
+    out.device()->seek(0);          //jamp to start block
     out << quint16(Data.size() - sizeof(quint16));
     socket->write(Data);
     ui->lineEdit->clear();
 }
 Message ChatClient::createMessage(QString nickame, QString text)
 {
-    return Message{ nickame, text, QTime::currentTime(), QUuid::createUuid().toString(), false };
+    return Message{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
 }
 //-------------window interface------------
 void ChatClient::on_nickNameLineEdit_returnPressed()
@@ -116,9 +116,9 @@ void ChatClient::on_connectButton_clicked()
             client.getRoomNum())
         {
             socket->connectToHost(client.getHostName(), client.getPort());
-            //тут в отдельном потоке или с помощью async await проверять когда статус будет if(socket->state() == QAbstractSocket::ConnectedState)
+            //with async await if(socket->state() == QAbstractSocket::ConnectedState)
             ui->connectButton->setText("Disconnect");
-            //и только тогда менять название
+            //and only after that change button title
         }
         else
         {
@@ -142,8 +142,8 @@ void ChatClient::on_roomButton_clicked()
 
 void ChatClient::on_sendButton_clicked()
 {
-    //формируем сообщение
-    //отправляем сообщение
+    //Create message function
+    //Send message function
     if (socket->state() == QAbstractSocket::ConnectedState)
     {
         sendToServer(createMessage(client.getUserName(), ui->lineEdit->text()));
