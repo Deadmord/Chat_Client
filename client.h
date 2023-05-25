@@ -3,13 +3,20 @@
 
 #include <QMainWindow>
 #include <QTime>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonParseError>
+#include <QFile>
+
+const QString CONFIG_FILE_PATH = "./config.json";
 
 class Client        //singleton
 {
 public:
-    static Client& instance(QString userName = nullptr, QString hostName = nullptr, quint16 port = 0, quint16 roomNum = 0)
+    static Client& instance(QString user_name_ = nullptr, QString server_address_ = nullptr, quint16 server_port_ = 0, quint16 room_number_ = 0)
     {
-        static Client inst(userName, hostName, port, roomNum);
+        static Client inst(user_name_, server_address_, server_port_, room_number_);
         return inst;
     };
 //---------getters-----------
@@ -27,20 +34,27 @@ public:
     void setLastMessageTime();
 
 private:
-    Client(QString &userName, QString &hostName, quint16 port, quint16 roomNum);
+    Client(QString user_name_, QString server_address_, quint16 server_port_, quint16 room_number_);
     ~Client();
     Client(Client const&) = delete;
     Client& operator= (Client const&) = delete;
 
+    void loadConfig(QString _path);
+    void saveConfig(QString _path);
+    void configFromJson(const QJsonDocument& config_json_);
+    QJsonObject configToJson();
+
 private:
-    QString userName = nullptr;
+    QString user_name;
+    QString user_password;
 
-    QString hostName = nullptr;
-    quint16 port = 0;
-    quint16 roomNum = 0;
+    QString server_address;         //move this var & relative func to ChatClient class
+    quint16 server_port;            //
+    quint16 flood_limit;            //
+    quint16 room_number;            //
+    QString msg_history_path;       //
 
-    QDateTime lastMessageTime;
-
+    QDateTime last_message_time;
 };
 
 #endif // CLIENT_H

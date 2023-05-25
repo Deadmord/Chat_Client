@@ -25,6 +25,10 @@ public slots:
     void slotReadyRead();
     void slotDisconnect();
 
+private:
+    Message createMessage(QString nickame, QString text);
+    void sendToServer(Message msg);
+
 private slots:
     void on_connectButton_clicked();
     void on_roomButton_clicked();
@@ -35,10 +39,6 @@ private slots:
     void on_serverIPLineEdit_returnPressed();
     void on_serverPortLineEdit_returnPressed();
     void on_roomLineEdit_returnPressed();
-
-private:
-    Message createMessage(QString nickame, QString text);
-    void sendToServer(Message msg);
 
 private:
     Ui::ChatClientClass *ui;
