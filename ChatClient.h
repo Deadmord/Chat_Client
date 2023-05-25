@@ -18,7 +18,7 @@ class ChatClient : public QMainWindow
     Q_OBJECT
 
 public:
-    ChatClient(Client& client, QWidget *parent = nullptr);
+    ChatClient(QWidget *parent = nullptr);
     ~ChatClient();
 
 public slots:

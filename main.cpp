@@ -4,8 +4,7 @@
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
-    Client& client = Client::instance();
-    ChatClient w(client);
+    ChatClient w;
     w.show();
     return a.exec();
 }
