@@ -1,11 +1,13 @@
 ﻿#include "ChatClient.h"
 
-ChatClient::ChatClient(Client& client, QWidget *parent)
+ChatClient::ChatClient(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::ChatClientClass())
-    , client(client)
+    , client(Client::instance())
 {
-    ui->setupUi(this);
+    //Client& client = Client::instance();
+    
+    ui->setupUi(this);                                                                  //Move it in function initiate socket
     socket = new QTcpSocket(this);
     connect(socket, &QTcpSocket::readyRead, this, &ChatClient::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, this, &ChatClient::slotDisconnect);
