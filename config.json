@@ -1,22 +1,11 @@
 {
-	"ServerAddress": "127.0.0.1",
-	"ServerPort": 5555,
-	"FloodLimit": 5
-	
-	"RoomsSettings":{
-		"LastRoomNumber": 0
-	}
-	
-	"MessagesHistorySettings": {
-		"Path": "./history",
-		"ExpireTime": "7d",
-		"TimeSlot": "5m"
-	},
-	
-	"LoggingSettings": {
-		"Path": "./history",
-		"LogLevel": "Debug",
-		"SizeLimit": 100,
-		"FilesNumberLimit": 10
-	}
+    "FloodLimit": 5,
+    "MessagesHistorySettings": {
+        "Path": "./history"
+    },
+    "RoomsSettings": {
+        "LastRoomNumber": 2
+    },
+    "ServerAddress": "127.0.0.1",
+    "ServerPort": 5555
 }
