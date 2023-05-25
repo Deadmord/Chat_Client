@@ -18,10 +18,11 @@ void ChatClient::startClient()
     loadConfig(CONFIG_FILE_PATH);                       //loading configuration settings
     //saveConfig(CONFIG_FILE_PATH);
 
-    ui->nickNameLineEdit->setText(QString(client.getUserName()));
-    ui->serverIPLineEdit->setText(server_address);
+    ui->serverIPLineEdit->setText(server_address);                  //вынести в функцию uiInit()
     ui->serverPortLineEdit->setText(QString::number(server_port));
-    ui->roomLineEdit->setText(QString::number(room_number));
+    ui->nickNameLineEdit->setText(client.getUserName());
+    ui->passwordLineEdit->setText(client.getUserPassword());
+    ui->roomLineEdit->setText(QString::number(client.getRoomNum()));
 
     initConnection();
 }
@@ -164,10 +165,20 @@ void ChatClient::configFromJson(const QJsonDocument& config_file_doc_)
     else
         qWarning() << "Error FloodLimit reading";
 
-    if (const QJsonValue v = config_file_doc_["RoomsSettings"]["LastRoomNumber"]; v.isDouble())
-        room_number = v.toInt();
+    if (const QJsonValue v = config_file_doc_["User"]["Nickname"]; v.isString())
+        client.setUserName(v.toString());
     else
-        qWarning() << "Error FloodLimit reading";
+        qWarning() << "Error LastRoomNumber reading";
+
+    if (const QJsonValue v = config_file_doc_["User"]["Password"]; v.isString())
+        client.setUserPassword(v.toString());
+    else
+        qWarning() << "Error LastRoomNumber reading";
+
+    if (const QJsonValue v = config_file_doc_["User"]["LastRoomNumber"]; v.isDouble())
+        client.setRoomNum(v.toInt());
+    else
+        qWarning() << "Error LastRoomNumber reading";
 
     if (const QJsonValue v = config_file_doc_["MessagesHistorySettings"]["Path"]; v.isString())
         msg_history_path = v.toString();
@@ -178,14 +189,16 @@ void ChatClient::configFromJson(const QJsonDocument& config_file_doc_)
 QJsonObject ChatClient::configToJson()
 {
     QJsonObject json;
-    QJsonObject room;
+    QJsonObject user;
     QJsonObject history;
 
     json["ServerAddress"] = server_address;
     json["ServerPort"] = server_port;
     json["FloodLimit"] = flood_limit;
-    room["LastRoomNumber"] = room_number;
-    json["RoomsSettings"] = room;
+    user["Nickname"] = client.getUserName();
+    user["Password"] = client.getUserPassword();
+    user["LastRoomNumber"] = client.getRoomNum();
+    json["User"] = user;
     history["Path"] = msg_history_path;
     json["MessagesHistorySettings"] = history;
 
@@ -215,11 +228,11 @@ void ChatClient::on_roomLineEdit_returnPressed()
 
 void ChatClient::on_connectButton_clicked()
 {
-    client.setUserName(ui->nickNameLineEdit->text());       
-    server_address = (ui->serverIPLineEdit->text());
-    server_port = (ui->serverPortLineEdit->text().toUInt());
-    room_number = ui->roomLineEdit->text().toUInt();
-    client.setRoomNum(room_number);
+    server_address = (ui->serverIPLineEdit->text());            //вынести в отдельную функцию
+    server_port = (ui->serverPortLineEdit->text().toUInt());    //для чтения и записи config использовать структуру, где формировать обьект конфига
+    client.setUserName(ui->nickNameLineEdit->text());
+    client.setUserPassword(ui->passwordLineEdit->text());
+    client.setRoomNum(ui->roomLineEdit->text().toUInt());
 
     saveConfig(CONFIG_FILE_PATH);
 

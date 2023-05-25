@@ -3,9 +3,11 @@
     "MessagesHistorySettings": {
         "Path": "./history"
     },
-    "RoomsSettings": {
-        "LastRoomNumber": 0
-    },
-    "ServerAddress": "127.0.0.100",
-    "ServerPort": 0
+    "ServerAddress": "127.0.0.1",
+    "ServerPort": 5555,
+    "User": {
+        "LastRoomNumber": 5,
+        "Nickname": "User123",
+        "Password": "Anton"
+    }
 }

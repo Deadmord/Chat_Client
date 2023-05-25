@@ -61,9 +61,8 @@ private:
     QByteArray Data;
     quint16 nextBlockSize = 0;
 
-    QString server_address;         //move this var & relative func to ChatClient class
+    QString server_address;         //
     quint16 server_port;            //
     quint16 flood_limit;            //
-    quint16 room_number;            //
     QString msg_history_path;       //
 };
