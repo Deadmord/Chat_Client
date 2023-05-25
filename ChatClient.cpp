@@ -5,17 +5,25 @@ ChatClient::ChatClient(QWidget *parent)
     , ui(new Ui::ChatClientClass())
     , client(Client::instance())
 {
-    //Client& client = Client::instance();
-    
-    ui->setupUi(this);                                                                  //Move it in function initiate socket
-    socket = new QTcpSocket(this);
-    connect(socket, &QTcpSocket::readyRead, this, &ChatClient::slotReadyRead);
-    connect(socket, &QTcpSocket::disconnected, this, &ChatClient::slotDisconnect);
+    ui->setupUi(this);
 }
 
 ChatClient::~ChatClient()
 {
     delete ui;
+}
+
+void ChatClient::startClient()
+{
+    loadConfig(CONFIG_FILE_PATH);                       //loading configuration settings
+    //saveConfig(CONFIG_FILE_PATH);
+
+    ui->nickNameLineEdit->setText(QString(client.getUserName()));
+    ui->serverIPLineEdit->setText(server_address);
+    ui->serverPortLineEdit->setText(QString::number(server_port));
+    ui->roomLineEdit->setText(QString::number(room_number));
+
+    initConnection();
 }
 
 void ChatClient::slotReadyRead()
@@ -78,10 +86,112 @@ void ChatClient::sendToServer(Message msg)
     socket->write(Data);
     ui->lineEdit->clear();
 }
+void ChatClient::initConnection()
+{
+    socket = new QTcpSocket(this);
+    connect(socket, &QTcpSocket::readyRead, this, &ChatClient::slotReadyRead);
+    connect(socket, &QTcpSocket::disconnected, this, &ChatClient::slotDisconnect);
+}
 Message ChatClient::createMessage(QString nickame, QString text)
 {
     return Message{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
 }
+
+void ChatClient::loadConfig(QString _path)
+{
+    QFile config_file;
+    QJsonDocument config_file_doc;
+    QJsonObject config_json;
+    QJsonParseError jsonError;
+
+    config_file.setFileName(_path);
+
+    if (config_file.open(QIODevice::ReadOnly | QFile::Text))
+    {
+        config_file_doc = QJsonDocument::fromJson(QByteArray(config_file.readAll()), &jsonError);
+        config_file.close();
+
+        if (jsonError.error == QJsonParseError::NoError)
+        {
+            configFromJson(config_file_doc);
+        }
+        else
+        {
+            qWarning() << "Error config file read: " << jsonError.error;
+        }
+    }
+    else
+    {
+        qWarning("Error configuration file cannot be opened.");
+    }
+}
+
+void ChatClient::saveConfig(QString _path)
+{
+    QFile config_file;
+    QJsonDocument config_file_doc;
+    QJsonObject config_json;
+    QJsonParseError jsonError;
+
+    config_file.setFileName(_path);
+    if (config_file.open(QIODevice::WriteOnly | QFile::Text))
+    {
+        config_json = configToJson();
+        config_file.write(QJsonDocument(config_json).toJson());
+    }
+    else
+    {
+        qDebug() << "Error configuration file cannot be opened.";
+    }
+}
+
+void ChatClient::configFromJson(const QJsonDocument& config_file_doc_)
+{
+    QJsonObject config_json = config_file_doc_.object();
+
+    if (const QJsonValue v = config_json["ServerAddress"]; v.isString())
+        server_address = v.toString();
+    else
+        qWarning() << "Error ServerAddress reading";
+
+    if (const QJsonValue v = config_json["ServerPort"]; v.isDouble())
+        server_port = v.toInt();
+    else
+        qWarning() << "Error ServerPort reading";
+
+    if (const QJsonValue v = config_json["FloodLimit"]; v.isDouble())
+        flood_limit = v.toInt();
+    else
+        qWarning() << "Error FloodLimit reading";
+
+    if (const QJsonValue v = config_file_doc_["RoomsSettings"]["LastRoomNumber"]; v.isDouble())
+        room_number = v.toInt();
+    else
+        qWarning() << "Error FloodLimit reading";
+
+    if (const QJsonValue v = config_file_doc_["MessagesHistorySettings"]["Path"]; v.isString())
+        msg_history_path = v.toString();
+    else
+        qWarning() << "Error MessagesHistorySettings path reading";
+}
+
+QJsonObject ChatClient::configToJson()
+{
+    QJsonObject json;
+    QJsonObject room;
+    QJsonObject history;
+
+    json["ServerAddress"] = server_address;
+    json["ServerPort"] = server_port;
+    json["FloodLimit"] = flood_limit;
+    room["LastRoomNumber"] = room_number;
+    json["RoomsSettings"] = room;
+    history["Path"] = msg_history_path;
+    json["MessagesHistorySettings"] = history;
+
+    return json;
+}
+
 //-------------window interface------------
 void ChatClient::on_nickNameLineEdit_returnPressed()
 {
@@ -90,12 +200,12 @@ void ChatClient::on_nickNameLineEdit_returnPressed()
 
 void ChatClient::on_serverIPLineEdit_returnPressed()
 {
-    client.setHostName(ui->serverIPLineEdit->text());
+    server_address = ui->serverIPLineEdit->text();
 }
 
 void ChatClient::on_serverPortLineEdit_returnPressed()
 {
-    client.setPort(ui->serverPortLineEdit->text().toUInt());
+    server_port = ui->serverPortLineEdit->text().toUInt();
 }
 
 void ChatClient::on_roomLineEdit_returnPressed()
@@ -105,19 +215,21 @@ void ChatClient::on_roomLineEdit_returnPressed()
 
 void ChatClient::on_connectButton_clicked()
 {
-    client.setUserName(ui->nickNameLineEdit->text());       //try to save curent settings
-    client.setHostName(ui->serverIPLineEdit->text());
-    client.setPort(ui->serverPortLineEdit->text().toUInt());
-    client.setRoomNum(ui->roomLineEdit->text().toUInt());
+    client.setUserName(ui->nickNameLineEdit->text());       
+    server_address = (ui->serverIPLineEdit->text());
+    server_port = (ui->serverPortLineEdit->text().toUInt());
+    room_number = ui->roomLineEdit->text().toUInt();
+    client.setRoomNum(room_number);
+
+    saveConfig(CONFIG_FILE_PATH);
 
     if (socket->state() == QAbstractSocket::UnconnectedState)
     {
         if (client.getUserName().size() &&
-            client.getHostName().size() &&
-            client.getPort() &&
-            client.getRoomNum())
+            server_address.size() &&
+            server_port)
         {
-            socket->connectToHost(client.getHostName(), client.getPort());
+            socket->connectToHost(server_address, server_port);
             //with async await if(socket->state() == QAbstractSocket::ConnectedState)
             ui->connectButton->setText("Disconnect");
             //and only after that change button title
@@ -131,9 +243,7 @@ void ChatClient::on_connectButton_clicked()
     {
         socket->disconnectFromHost();
         ui->connectButton->setText("Connect");
-        socket = new QTcpSocket(this);
-        connect(socket, &QTcpSocket::readyRead, this, &ChatClient::slotReadyRead);
-        connect(socket, &QTcpSocket::disconnected, this, &ChatClient::slotDisconnect);
+        initConnection();
     }
 }
 

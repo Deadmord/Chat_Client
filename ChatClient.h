@@ -5,9 +5,16 @@
 #include <QMessageBox>
 #include <QTime>
 #include <QUuid>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonParseError>
+#include <QFile>
 #include "entities.h"
 #include "client.h"
 #include "ui_ChatClient.h"
+
+const QString CONFIG_FILE_PATH = "./config.json";
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ChatClientClass; };
@@ -20,6 +27,7 @@ class ChatClient : public QMainWindow
 public:
     ChatClient(QWidget *parent = nullptr);
     ~ChatClient();
+    void startClient();
 
 public slots:
     void slotReadyRead();
@@ -28,6 +36,12 @@ public slots:
 private:
     Message createMessage(QString nickame, QString text);
     void sendToServer(Message msg);
+    void initConnection();
+    //-------Config-file-functions-------
+    void loadConfig(QString _path);
+    void saveConfig(QString _path);
+    void configFromJson(const QJsonDocument& config_json_);
+    QJsonObject configToJson();
 
 private slots:
     void on_connectButton_clicked();
@@ -46,4 +60,10 @@ private:
     Client& client;
     QByteArray Data;
     quint16 nextBlockSize = 0;
+
+    QString server_address;         //move this var & relative func to ChatClient class
+    quint16 server_port;            //
+    quint16 flood_limit;            //
+    quint16 room_number;            //
+    QString msg_history_path;       //
 };
