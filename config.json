@@ -4,8 +4,8 @@
         "Path": "./history"
     },
     "RoomsSettings": {
-        "LastRoomNumber": 2
+        "LastRoomNumber": 0
     },
-    "ServerAddress": "127.0.0.1",
-    "ServerPort": 5555
+    "ServerAddress": "127.0.0.100",
+    "ServerPort": 0
 }
