@@ -144,6 +144,7 @@ void ChatClient::saveConfig(QString _path)
     {
         qDebug() << "Error configuration file cannot be opened.";
     }
+    config_file.close();
 }
 
 void ChatClient::configFromJson(const QJsonDocument& config_file_doc_)
