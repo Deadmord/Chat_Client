@@ -229,7 +229,7 @@ void ChatClient::on_roomLineEdit_returnPressed()
 
 void ChatClient::on_connectButton_clicked()
 {
-    server_address = (ui->serverIPLineEdit->text());            //вынести в отдельную функцию
+    server_address = (ui->serverIPLineEdit->text());            //вынести в отдельную функцию или слот
     server_port = (ui->serverPortLineEdit->text().toUInt());    //для чтения и записи config использовать структуру, где формировать обьект конфига
     client.setUserName(ui->nickNameLineEdit->text());
     client.setUserPassword(ui->passwordLineEdit->text());
