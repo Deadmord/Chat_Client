@@ -18,7 +18,7 @@ void ChatClient::startClient()
     loadConfig(CONFIG_FILE_PATH);                       //loading configuration settings
     //saveConfig(CONFIG_FILE_PATH);
 
-    ui->serverIPLineEdit->setText(server_address);                  //������� � ������� uiInit()
+    ui->serverIPLineEdit->setText(server_address);                  //вынести в функцию uiInit()
     ui->serverPortLineEdit->setText(QString::number(server_port));
     ui->nickNameLineEdit->setText(client.getUserName());
     ui->passwordLineEdit->setText(client.getUserPassword());
