@@ -1,3 +1,7 @@
+### PLog ###
+log.txt
+log.*.txt
+
 ### C++ ###
 # Prerequisites
 *.d
