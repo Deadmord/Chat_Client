@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <QtRcc Include="ChatClient.qrc" />
     <QtUic Include="ChatClient.ui" />
     <QtMoc Include="ChatClient.h" />
@@ -103,5 +104,12 @@
     <Import Project="$(QtMsBuild)\qt.targets" />
   </ImportGroup>
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\Chat_Server\packages\plog.1.1.9\build\native\plog.targets" Condition="Exists('..\Chat_Server\packages\plog.1.1.9\build\native\plog.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\Chat_Server\packages\plog.1.1.9\build\native\plog.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\Chat_Server\packages\plog.1.1.9\build\native\plog.targets'))" />
+  </Target>
 </Project>
