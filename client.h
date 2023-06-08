@@ -7,21 +7,21 @@
 class Client        //singleton
 {
 public:
-    static Client& instance(QString user_name_ = nullptr, QString user_password_ = nullptr, quint16 room_number_ = 0)
+    static Client& instance(QString user_name_ = nullptr, QString user_password_ = nullptr, quint16 room_curr_number_ = 0)
     {
-        static Client inst(user_name_, user_password_, room_number_);
+        static Client inst(user_name_, user_password_, room_curr_number_);
         return inst;
     };
 //---------getters-----------
-    const QString& getUserName();
+    const QString& getUserNickname();
     const QString& getUserPassword();
     quint16 getRoomNum();
     const QDateTime& getLastMessageTime();
 
     //---------setters-----------
-    void setUserName(QString userName);
-    void setUserPassword(QString hostName);
-    void setRoomNum(quint16 roomNum);
+    void setUserNickname(QString user_nickname_);
+    void setUserPassword(QString user_password_);
+    void setRoomNum(quint16 room_curr_number_);
     void setLastMessageTime();
 
 private:
@@ -31,10 +31,9 @@ private:
     Client& operator= (Client const&) = delete;
 
 private:
-    QString user_name;
+    QString user_nickname;
     QString user_password;
-    quint16 room_number;
-    QDateTime last_message_time;
+    quint16 user_curr_room_number;
 };
 
 #endif // CLIENT_H

@@ -2,15 +2,14 @@
 
 ChatClient::ChatClient(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::ChatClientClass())
     , client(Client::instance())
 {
-    ui->setupUi(this);
+    mes_w.show();
 }
 
 ChatClient::~ChatClient()
 {
-    delete ui;
+    //delete ui;
 }
 
 void ChatClient::startClient()
@@ -18,11 +17,11 @@ void ChatClient::startClient()
     loadConfig(CONFIG_FILE_PATH);                       //loading configuration settings
     //saveConfig(CONFIG_FILE_PATH);
 
-    ui->serverIPLineEdit->setText(server_address);                  //вынести в функцию uiInit()
-    ui->serverPortLineEdit->setText(QString::number(server_port));
-    ui->nickNameLineEdit->setText(client.getUserName());
-    ui->passwordLineEdit->setText(client.getUserPassword());
-    ui->roomLineEdit->setText(QString::number(client.getRoomNum()));
+    //ui->serverIPLineEdit->setText(server_address);                  //вынести в функцию uiInit()
+    //ui->serverPortLineEdit->setText(QString::number(server_port));
+    //ui->nickNameLineEdit->setText(client.getUserNickname());
+    //ui->passwordLineEdit->setText(client.getUserPassword());
+    //ui->roomLineEdit->setText(QString::number(client.getRoomNum()));
 
     initConnection();
 }
@@ -52,40 +51,40 @@ void ChatClient::slotReadyRead()
                 break;
             }
             //strange conditionб warning
-            Message msg;
-            in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
+            MessageStruct msg;
+            in >>  msg.mes_time >> msg.mes_nickname >> msg.mes_is_deleted >> msg.mes_text;
 
             nextBlockSize = 0;
-            if (!msg.deleted)                //TODO Create printmessage function
+            if (!msg.mes_is_deleted)                //TODO Create printmessage function
             {
-                ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
+                //ui->textBrowser->append(msg.mes_time.toString() + " " + msg.mes_nickname + " :\t" + msg.mes_text);
             }
         }
     }
     else
     {
-        ui->textBrowser->append("Read error");
+        //ui->textBrowser->append("Read error");
     }
 }
 
 void ChatClient::slotDisconnect()
 {
     socket->deleteLater();
-    ui->textBrowser->append("Server disconnected!");
+    //ui->textBrowser->append("Server disconnected!");
 }
 
-void ChatClient::sendToServer(Message msg)
+void ChatClient::sendToServer(MessageStruct msg)
 {
     Data.clear();
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
 
-    out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // ToDo: define operators << and >> for "Messege"
+    out << quint16(0) << msg.mes_time << msg.mes_nickname << msg.mes_is_deleted << msg.mes_text; // ToDo: define operators << and >> for "Messege"
 
     out.device()->seek(0);          //jamp to start block
     out << quint16(Data.size() - sizeof(quint16));
     socket->write(Data);
-    ui->lineEdit->clear();
+    //ui->lineEdit->clear();
 }
 void ChatClient::initConnection()
 {
@@ -93,10 +92,11 @@ void ChatClient::initConnection()
     connect(socket, &QTcpSocket::readyRead, this, &ChatClient::slotReadyRead);
     connect(socket, &QTcpSocket::disconnected, this, &ChatClient::slotDisconnect);
 }
-Message ChatClient::createMessage(QString nickame, QString text)
-{
-    return Message{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
-}
+
+//MessageStruct ChatClient::createMessage(QString nickame, QString text)
+//{
+//    return MessageStruct{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
+//}
 
 void ChatClient::loadConfig(QString _path)
 {
@@ -167,7 +167,7 @@ void ChatClient::configFromJson(const QJsonDocument& config_file_doc_)
         qWarning() << "Error FloodLimit reading";
 
     if (const QJsonValue v = config_file_doc_["User"]["Nickname"]; v.isString())
-        client.setUserName(v.toString());
+        client.setUserNickname(v.toString());
     else
         qWarning() << "Error LastRoomNumber reading";
 
@@ -196,7 +196,7 @@ QJsonObject ChatClient::configToJson()
     json["ServerAddress"] = server_address;
     json["ServerPort"] = server_port;
     json["FloodLimit"] = flood_limit;
-    user["Nickname"] = client.getUserName();
+    user["Nickname"] = client.getUserNickname();
     user["Password"] = client.getUserPassword();
     user["LastRoomNumber"] = client.getRoomNum();
     json["User"] = user;
@@ -209,54 +209,54 @@ QJsonObject ChatClient::configToJson()
 //-------------window interface------------
 void ChatClient::on_nickNameLineEdit_returnPressed()
 {
-    client.setUserName(ui->nickNameLineEdit->text());
+    //client.setUserNickname(ui->nickNameLineEdit->text());
 }
 
 void ChatClient::on_serverIPLineEdit_returnPressed()
 {
-    server_address = ui->serverIPLineEdit->text();
+    //server_address = ui->serverIPLineEdit->text();
 }
 
 void ChatClient::on_serverPortLineEdit_returnPressed()
 {
-    server_port = ui->serverPortLineEdit->text().toUInt();
+    //server_port = ui->serverPortLineEdit->text().toUInt();
 }
 
 void ChatClient::on_roomLineEdit_returnPressed()
 {
-    client.setRoomNum(ui->roomLineEdit->text().toUInt());
+    //client.setRoomNum(ui->roomLineEdit->text().toUInt());
 }
 
 void ChatClient::on_connectButton_clicked()
 {
-    server_address = (ui->serverIPLineEdit->text());            //вынести в отдельную функцию или слот
-    server_port = (ui->serverPortLineEdit->text().toUInt());    //для чтения и записи config использовать структуру, где формировать обьект конфига
-    client.setUserName(ui->nickNameLineEdit->text());
-    client.setUserPassword(ui->passwordLineEdit->text());
-    client.setRoomNum(ui->roomLineEdit->text().toUInt());
+    //server_address = (ui->serverIPLineEdit->text());            //вынести в отдельную функцию или слот
+    //server_port = (ui->serverPortLineEdit->text().toUInt());    //для чтения и записи config использовать структуру, где формировать обьект конфига
+    //client.setUserNickname(ui->nickNameLineEdit->text());
+    //client.setUserPassword(ui->passwordLineEdit->text());
+    //client.setRoomNum(ui->roomLineEdit->text().toUInt());
 
     saveConfig(CONFIG_FILE_PATH);
 
     if (socket->state() == QAbstractSocket::UnconnectedState)
     {
-        if (client.getUserName().size() &&
+        if (client.getUserNickname().size() &&
             server_address.size() &&
             server_port)
         {
             socket->connectToHost(server_address, server_port);
             //with async await if(socket->state() == QAbstractSocket::ConnectedState)
-            ui->connectButton->setText("Disconnect");
+            //ui->connectButton->setText("Disconnect");
             //and only after that change button title
         }
         else
         {
-            ui->textBrowser->append("Fill your name and server address, please.");
+            //ui->textBrowser->append("Fill your name and server address, please.");
         }
     }
     else
     {
         socket->disconnectFromHost();
-        ui->connectButton->setText("Connect");
+        //ui->connectButton->setText("Connect");
         initConnection();
     }
 }
@@ -272,11 +272,11 @@ void ChatClient::on_sendButton_clicked()
     //Send message function
     if (socket->state() == QAbstractSocket::ConnectedState)
     {
-        sendToServer(createMessage(client.getUserName(), ui->lineEdit->text()));
+        //sendToServer(createMessage(client.getUserNickname(), ui->lineEdit->text()));
     }
     else
     {
-        ui->textBrowser->append("Not Connected to Server");
+        //ui->textBrowser->append("Not Connected to Server");
         qDebug() << socket->state();
     }
 }

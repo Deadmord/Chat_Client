@@ -12,13 +12,9 @@
 #include <QFile>
 #include "entities.h"
 #include "client.h"
-#include "ui_ChatClient.h"
+#include "Message.h"
 
 const QString CONFIG_FILE_PATH = "./config.json";
-
-QT_BEGIN_NAMESPACE
-namespace Ui { class ChatClientClass; };
-QT_END_NAMESPACE
 
 class ChatClient : public QMainWindow
 {
@@ -34,8 +30,8 @@ public slots:
     void slotDisconnect();
 
 private:
-    Message createMessage(QString nickame, QString text);
-    void sendToServer(Message msg);
+    MessageStruct createMessage(QString nickame, QString text);
+    void sendToServer(MessageStruct msg);
     void initConnection();
     //-------Config-file-functions-------
     void loadConfig(QString _path);
@@ -55,7 +51,8 @@ private slots:
     void on_roomLineEdit_returnPressed();
 
 private:
-    Ui::ChatClientClass *ui;
+    Message mes_w;
+
     QTcpSocket* socket;
     Client& client;
     QByteArray Data;
