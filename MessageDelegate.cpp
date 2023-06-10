@@ -2,14 +2,6 @@
 #include "MessageDelegate.h"
 
 
-//MessageDelegate::MessageDelegate(QObject* parent)
-//    : QItemDelegate(parent)
-//{
-//}
-//
-//MessageDelegate::~MessageDelegate()
-//{}
-
 void MessageDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     

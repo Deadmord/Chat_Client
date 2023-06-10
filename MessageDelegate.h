@@ -12,20 +12,6 @@
 
 
 class MessageDelegate : public QStyledItemDelegate {
-
-//public:
-//	explicit MessageDelegate(QObject* parent);
-//	~MessageDelegate() override;
-//	MessageDelegate(const MessageDelegate&) = delete;
-//	MessageDelegate(MessageDelegate&&) = delete;
-//	const MessageDelegate& operator =(const MessageDelegate&) = delete;
-//	MessageDelegate& operator = (MessageDelegate&&) = delete;
-//
-//protected:
-//
-//	void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-//	[[nodiscard]] QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
-
 public:
     explicit MessageDelegate(QObject* parent = nullptr)
         : QStyledItemDelegate(parent)
@@ -45,7 +31,7 @@ private:
     MyFont nickname_font = MyFont(font, text_size);
     MyFont time_font = MyFont(font, time_size);
 
-	QPixmap _like_pixmap{ ":/mainWindow/resources/heart.png" };
-	QPixmap _dislike_pixmap{ ":/mainWindow/resources/broken.png" };
+	QPixmap _like_pixmap{ ":../Chat_Client/resources/heart.png" };
+	QPixmap _dislike_pixmap{ ":../Chat_Client/resources/broken.png" };
 };
 

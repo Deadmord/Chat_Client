@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/mainwindow">
+        <file>resources/avatar.png</file>
+        <file>resources/avatar_1.png</file>
+        <file>resources/avatar_2.png</file>
+        <file>resources/avatar_3.png</file>
+        <file>resources/avatarka_1.png</file>
+        <file>resources/avatarka_2.png</file>
+        <file>resources/avatarka_3.png</file>
+        <file>resources/broken.png</file>
+        <file>resources/cute.png</file>
+        <file>resources/heart.png</file>
+        <file>resources/tile.png</file>
+        <file>resources/wall.jpg</file>
+        <file>resources/wall_s.png</file>
+    </qresource>
+</RCC>
