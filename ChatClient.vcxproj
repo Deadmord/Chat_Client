@@ -96,7 +96,7 @@
     <ResourceCompile Include="ChatClient.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="client.h" />
+    <QtMoc Include="client.h" />
     <ClInclude Include="entities.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

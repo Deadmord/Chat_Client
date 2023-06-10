@@ -5,9 +5,9 @@
 
 int main(int argc, char* argv[])
 {
-
     plog::init(plog::debug, "log.txt", 1000000, 5);
-    PLOGD << "CLient Application Start";
+    PLOGD << "CLient application starting. Logging is enabled.";
+
     QApplication a(argc, argv);
     ChatClient w;
     w.startClient();

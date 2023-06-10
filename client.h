@@ -2,17 +2,27 @@
 #define CLIENT_H
 
 #include <QMainWindow>
+#include <QObject>
+#include <QTcpSocket>
 #include <QTime>
+#include <QDataStream>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonParseError>
 
-class Client        //singleton
+class Client : public QObject        //singleton
 {
+    Q_OBJECT
+    Q_DISABLE_COPY(Client)
+private:
+    Client(QObject* parent = nullptr);
+    ~Client();
 public:
-    static Client& instance(QString user_name_ = nullptr, QString user_password_ = nullptr, quint16 room_number_ = 0)
-    {
-        static Client inst(user_name_, user_password_, room_number_);
-        return inst;
-    };
-//---------getters-----------
+    static Client* instance(QObject* parent = nullptr);
+
+    //---------getters-----------
     const QString& getUserName();
     const QString& getUserPassword();
     quint16 getRoomNum();
@@ -24,17 +34,35 @@ public:
     void setRoomNum(quint16 roomNum);
     void setLastMessageTime();
 
-private:
-    Client(QString user_name_, QString user_password_, quint16 room_number_);
-    ~Client();
-    Client(Client const&) = delete;
-    Client& operator= (Client const&) = delete;
+signals:
+    void connected();
+    void disconnected();
+    void loggedIn();
+    void loginError(const QString& reason);
+    void messageReceived(const QString& sender, const QString& text);
+    void errorSignal(QAbstractSocket::SocketError socket_error);
+    void userJoined(const QString& username);
+    void userLeft(const QString& username);
+
+public slots:
+    void connectToServer(const QHostAddress& address, quint16 port);
+    void login(const QString& username);
+    void sendMessage(const QString& text);
+    void disconnectFromHost();
+private slots:
+    void onReadyRead();
 
 private:
+    void jsonReceived(const QJsonObject& doc);
+
+private:
+    QTcpSocket* client_socket;
     QString user_name;
     QString user_password;
     quint16 room_number;
-    QDateTime last_message_time;
+    QDateTime last_message_time = {};
+    bool logged_in;
+
 };
 
 #endif // CLIENT_H
