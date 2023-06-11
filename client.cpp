@@ -183,6 +183,7 @@ void Client::onReadyRead()
             break;
         }
         nextBlockSize = 0;
+        break;
     }
 }
 
