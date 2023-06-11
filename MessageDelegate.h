@@ -4,6 +4,8 @@
 #include <QPainter>
 #include <QListView>
 #include <QPushButton>
+#include <QStyleOptionButton>
+#include <QStyle>
 #include <QPainterPath>
 #include "QHBoxLayout"
 #include "entities.h"
@@ -11,7 +13,8 @@
 #include "paint_defs.h"
 
 
-class MessageDelegate : public QStyledItemDelegate {
+class MessageDelegate : public QStyledItemDelegate 
+{
 public:
     explicit MessageDelegate(QObject* parent = nullptr)
         : QStyledItemDelegate(parent)

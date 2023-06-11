@@ -8,7 +8,7 @@ void MessageDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
     if (!index.isValid())
         return;
 
-    createEditor(const_cast<QWidget*>(option.widget), option, index);
+    //createEditor(const_cast<QWidget*>(option.widget), option, index);
 
 
     const auto& draw_message = [] {
@@ -57,6 +57,11 @@ void MessageDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
     QRect timeRect = bubbleRect.adjusted(10, (5 + nickname_height + 5 + text_height + 5), -10, -5);
     painter->drawText(timeRect, Qt::AlignRight | Qt::AlignBottom, message.mes_time.toString("dd:MM:yy hh:mm"));
 
+    
+
+
+    //--------------------------------------------------//
+
     const auto whole_rect = option.rect.adjusted(option.rect.width() / 4, 0, -option.rect.width() / 4, 0);
     auto const& body_rect = whole_rect.adjusted(-5, 0, 20, 0);
 
@@ -68,31 +73,31 @@ void MessageDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
         gl_action_box_size
     };
 
-    const auto& draw_actions = [&]()
-        {
+    //const auto& draw_actions = [&]()
+    //    {
 
-        	// draw shadow
-        	QPainterPath path;
-        	path.addRoundedRect(QRectF(actions_rect.adjusted(gl_shadow_offset, gl_shadow_offset, gl_shadow_offset, gl_shadow_offset)), 3, 3);
-        	painter->fillPath(path, gl_shadow_color);
-        	path.clear();
+    //    	// draw shadow
+    //    	QPainterPath path;
+    //    	path.addRoundedRect(QRectF(actions_rect.adjusted(gl_shadow_offset, gl_shadow_offset, gl_shadow_offset, gl_shadow_offset)), 3, 3);
+    //    	painter->fillPath(path, gl_shadow_color);
+    //    	path.clear();
 
-        	// draw body
-        	path.addRoundedRect(QRectF(actions_rect), 3, 3);
-        	painter->fillPath(path, gl_action_box_color);
+    //    	// draw body
+    //    	path.addRoundedRect(QRectF(actions_rect), 3, 3);
+    //    	painter->fillPath(path, gl_action_box_color);
 
-        	auto const action_rc = QRect{
-        		QPoint{
-        			actions_rect.left() + gl_action_icon_margins.x(),
-        			actions_rect.top() + gl_action_icon_margins.y() 	},
-        		gl_action_icon_size };
-        	painter->drawPixmap(action_rc, _like_pixmap.scaled(gl_action_icon_size , Qt::KeepAspectRatio ));
-        	auto const dislike_rc = action_rc.translated({ gl_action_icon_width + 10, 0 });
-        	painter->drawPixmap(dislike_rc, _dislike_pixmap.scaled(gl_action_icon_size, Qt::KeepAspectRatio));
+    //    	auto const action_rc = QRect{
+    //    		QPoint{
+    //    			actions_rect.left() + gl_action_icon_margins.x(),
+    //    			actions_rect.top() + gl_action_icon_margins.y() 	},
+    //    		gl_action_icon_size };
+    //    	painter->drawPixmap(action_rc, _like_pixmap.scaled(gl_action_icon_size , Qt::KeepAspectRatio ));
+    //    	auto const dislike_rc = action_rc.translated({ gl_action_icon_width + 10, 0 });
+    //    	painter->drawPixmap(dislike_rc, _dislike_pixmap.scaled(gl_action_icon_size, Qt::KeepAspectRatio));
 
-        };
+    //    };
 
-    draw_actions();
+    //draw_actions();
     
 }
 

@@ -1,26 +1,26 @@
 #pragma once
 
 #include <QAbstractListModel>
-#include <QTimeZone>
-#include <memory>
+#include <plog/Log.h> 
 
 #include "entities.h"
 
-class MessageModel : public QAbstractListModel
+class LogInWModel : public QAbstractListModel
 {
 public:
-    MessageModel(QObject* parent = nullptr)
+    LogInWModel(QObject* parent = nullptr)
         : QAbstractListModel(parent)
     {
     }
-    void setChatData(const QList<MessageStruct>& chatData);
+    void setLogInData(const QList<LogInWStruct>& chatData);
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
 private:
-    QList<MessageStruct> message_list_model;
+    QList<LogInWStruct> logIn_list_model;
 
 public slots:
-    void sendMessage(const QString& value_);
+    void onLogInClick(const LogInWStruct& value_);
+    void onSignInClick();
 };
 

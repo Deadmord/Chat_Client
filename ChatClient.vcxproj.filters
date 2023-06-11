@@ -32,6 +32,9 @@
     <QtMoc Include="Message.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="LogInW.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -52,6 +55,15 @@
     <ClCompile Include="MyFont.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LogInW.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogInWModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LogInWDelegate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h">
@@ -70,6 +82,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MessageDelegate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogInWModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogInWDelegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

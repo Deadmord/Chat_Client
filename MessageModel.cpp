@@ -2,10 +2,11 @@
 
 
 
-void MessageModel::setChatData(const QList<MessageStruct>& chatData)
+void MessageModel::setChatData(const QList<MessageStruct>& chatData_)
 {
     beginResetModel();
-    message_list_model = chatData;
+    message_list_model = chatData_;
+
     endResetModel();
 }
 

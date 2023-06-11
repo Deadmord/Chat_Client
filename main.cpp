@@ -3,6 +3,7 @@
 #include <plog/Initializers/RollingFileInitializer.h>
 #include "ChatClient.h"
 #include "Message.h"
+#include "LogInW.h"
 
 int main(int argc, char* argv[])
 {
@@ -14,6 +15,7 @@ int main(int argc, char* argv[])
     //ChatClient w;
     //w.startClient();
     Message w;
+    //LogInW w;
     w.show();
     return a.exec();
 }

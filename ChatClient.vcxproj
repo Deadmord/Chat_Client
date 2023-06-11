@@ -55,7 +55,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)</OutDir>
+    <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)</OutDir>
@@ -85,6 +85,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="LogInWDelegate.cpp" />
+    <ClCompile Include="LogInW.cpp" />
+    <ClCompile Include="LogInWModel.cpp" />
     <ClCompile Include="MyFont.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageDelegate.cpp" />
@@ -98,6 +101,9 @@
   <ItemGroup>
     <ClInclude Include="client.h" />
     <ClInclude Include="entities.h" />
+    <QtMoc Include="LogInW.h" />
+    <ClInclude Include="LogInWDelegate.h" />
+    <ClInclude Include="LogInWModel.h" />
     <ClInclude Include="paint_defs.h" />
     <QtMoc Include="Message.h" />
     <ClInclude Include="MyFont.h" />
