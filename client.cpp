@@ -49,10 +49,8 @@ void Client::login(const QString& userName)
         message[QStringLiteral("type")] = QStringLiteral("login");
         message[QStringLiteral("username")] = userName;
         // send the JSON using QDataStream
-        clientStream << quint16(0) << QJsonDocument(message).toJson(QJsonDocument::Compact);
-        clientStream.device()->seek(0);          // jamp to start block
-        // write size of data in datastream
-        clientStream << quint16(QJsonDocument(message).toJson().size() - sizeof(quint16));
+        const QByteArray jsonData = QJsonDocument(message).toJson(QJsonDocument::Compact);
+        clientStream << quint16(jsonData.size()) << jsonData;
     }
 }
 
@@ -69,10 +67,8 @@ void Client::sendMessage(const QString& text)
     message[QStringLiteral("type")] = QStringLiteral("message");
     message[QStringLiteral("text")] = text;
     // reserv size part in stream and send the JSON using QDataStream
-    clientStream << quint16(0) << QJsonDocument(message).toJson();
-    clientStream.device()->seek(0);          // jamp to start block
-    // write size of data in datastream
-    clientStream << quint16(QJsonDocument(message).toJson().size() - sizeof(quint16));
+    const QByteArray jsonData = QJsonDocument(message).toJson();
+    clientStream << quint16(jsonData.size()) << jsonData;
 }
 
 void Client::disconnectFromHost()
