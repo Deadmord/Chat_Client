@@ -55,7 +55,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)</OutDir>
+    <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)</OutDir>
@@ -85,6 +85,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ServerC.cpp" />
     <None Include="packages.config" />
     <QtRcc Include="ChatClient.qrc" />
     <QtUic Include="ChatClient.ui" />
@@ -98,6 +99,7 @@
   <ItemGroup>
     <ClInclude Include="client.h" />
     <ClInclude Include="entities.h" />
+    <ClInclude Include="ServerC.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

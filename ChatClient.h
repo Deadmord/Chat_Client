@@ -54,6 +54,19 @@ private slots:
     void on_serverPortLineEdit_returnPressed();
     void on_roomLineEdit_returnPressed();
 
+public Q_SLOTS:
+
+    //-----LogInW-----
+    void on_log_in_button_clicked();
+    void on_sign_in_button_clicked();
+
+    //-----ChatListW-----
+
+    //-----ChatW-----
+    //void on_send_button_clicked();
+    //void on_attach_files();
+    //void on_image_clicked(const QString& image_path);
+
 private:
     Ui::ChatClientClass *ui;
     QTcpSocket* socket;
