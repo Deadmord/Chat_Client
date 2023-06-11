@@ -2,12 +2,30 @@
 
 Client::Client(QObject* parent)
     : QObject(parent)
-    , client_socket(new QTcpSocket(this))
     , logged_in(false)
 {
+    initSocket();
+}
+
+Client::~Client() {}
+
+Client* Client::instance(QObject* parent)
+{
+    static Client inst(parent);
+    return &inst;
+}
+const QTcpSocket* Client::socketInfo()
+{
+    return client_socket;
+}
+
+void Client::initSocket()
+{
+    client_socket = new QTcpSocket(this);
     // Forward the connected and disconnected signals
     connect(client_socket, &QTcpSocket::connected, this, &Client::connected);
     connect(client_socket, &QTcpSocket::disconnected, this, &Client::disconnected);
+    connect(client_socket, &QTcpSocket::disconnected, client_socket, &QTcpSocket::deleteLater);
 
     // connect readyRead() to the slot that will take care of reading the data in
     connect(client_socket, &QTcpSocket::readyRead, this, &Client::onReadyRead);
@@ -18,14 +36,6 @@ Client::Client(QObject* parent)
     // Reset the m_loggedIn variable when we disconnect. Since the operation is trivial we use a lambda instead of creating another slot
     connect(client_socket, &QTcpSocket::disconnected, this, [this]()->void {logged_in = false; });
 }
-
-Client::~Client() {}
-
-Client* Client::instance(QObject* parent)
-{
-    static Client inst(parent);
-    return &inst;
-};
 
 void Client::login(const QString& userName)
 {
@@ -39,7 +49,10 @@ void Client::login(const QString& userName)
         message[QStringLiteral("type")] = QStringLiteral("login");
         message[QStringLiteral("username")] = userName;
         // send the JSON using QDataStream
-        clientStream << QJsonDocument(message).toJson(QJsonDocument::Compact);
+        clientStream << quint16(0) << QJsonDocument(message).toJson(QJsonDocument::Compact);
+        clientStream.device()->seek(0);          // jamp to start block
+        // write size of data in datastream
+        clientStream << quint16(QJsonDocument(message).toJson().size() - sizeof(quint16));
     }
 }
 
@@ -55,13 +68,17 @@ void Client::sendMessage(const QString& text)
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
     message[QStringLiteral("text")] = text;
-    // send the JSON using QDataStream
-    clientStream << QJsonDocument(message).toJson();
+    // reserv size part in stream and send the JSON using QDataStream
+    clientStream << quint16(0) << QJsonDocument(message).toJson();
+    clientStream.device()->seek(0);          // jamp to start block
+    // write size of data in datastream
+    clientStream << quint16(QJsonDocument(message).toJson().size() - sizeof(quint16));
 }
 
 void Client::disconnectFromHost()
 {
     client_socket->disconnectFromHost();
+    initSocket();
 }
 
 void Client::jsonReceived(const QJsonObject& docObj)
@@ -133,6 +150,20 @@ void Client::onReadyRead()
     socketStream.setVersion(QDataStream::Qt_6_5);
     // start an infinite loop
     for (;;) {
+        // get size of data
+        if (nextBlockSize == 0)
+        {
+            if (client_socket->bytesAvailable() < 2)
+            {
+                break;
+            }
+            socketStream >> nextBlockSize;
+        }
+        // if avalable bytes less than size of data we exit the loop and wait for more data to become available
+        if (client_socket->bytesAvailable() < nextBlockSize)
+        {
+            break;
+        }
         // we start a transaction so we can revert to the previous state in case we try to read more data than is available on the socket
         socketStream.startTransaction();
         // we try to read the JSON data
@@ -155,6 +186,7 @@ void Client::onReadyRead()
             // we just exit the loop and wait for more data to become available
             break;
         }
+        nextBlockSize = 0;
     }
 }
 

@@ -22,6 +22,7 @@ ChatClient::ChatClient(QWidget *parent)
     connect(client, &Client::userLeft, this, &ChatClient::userLeft);
     // connect the connect button to a slot that will attempt the connection
     connect(ui->connectButton, &QPushButton::clicked, this, &ChatClient::attemptConnection);
+    connect(ui->connectButton, &QPushButton::clicked, this, &ChatClient::keepCurrentConfig);
     // connect the click of the "send" button and the press of the enter while typing to the slot that sends the message
     connect(ui->sendButton, &QPushButton::clicked, this, &ChatClient::sendMessage);
     connect(ui->messageEdit, &QLineEdit::returnPressed, this, &ChatClient::sendMessage);
@@ -33,7 +34,6 @@ ChatClient::~ChatClient()
     delete ui;
 }
 
-//-----Old start------------------------
 void ChatClient::startClient()
 {
     loadConfig(CONFIG_FILE_PATH);                       //loading configuration settings
@@ -44,79 +44,6 @@ void ChatClient::startClient()
     ui->nickNameLineEdit->setText(client->getUserName());
     ui->passwordLineEdit->setText(client->getUserPassword());
     ui->roomLineEdit->setText(QString::number(client->getRoomNum()));
-
-    initConnection();
-}
-
-void ChatClient::slotReadyRead()
-{
-    QDataStream in(socket);
-    in.setVersion(QDataStream::Qt_6_2);
-    if (in.status() == QDataStream::Ok)
-    {
-        //        QString str;
-        //        in >> str;
-        //        ui->textBrowser->append(str);
-        for (;;)
-        {
-            //ToDo: looks like it sould be in separate thread, couse a waiting
-            if (nextBlockSize == 0)
-            {
-                if (socket->bytesAvailable() < 2)
-                {
-                    break;
-                }
-                in >> nextBlockSize;
-            }
-            if (socket->bytesAvailable() < nextBlockSize)
-            {
-                break;
-            }
-            //strange conditionб warning
-            Message msg;
-            in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
-
-            nextBlockSize = 0;
-            if (!msg.deleted)                //TODO Create printmessage function
-            {
-                ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
-            }
-        }
-    }
-    else
-    {
-        ui->textBrowser->append("Read error");
-    }
-}
-
-void ChatClient::slotDisconnect()
-{
-    socket->deleteLater();
-    ui->textBrowser->append("Server disconnected!");
-}
-
-void ChatClient::sendToServer(Message msg)
-{
-    Data.clear();
-    QDataStream out(&Data, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_6_2);
-
-    out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // ToDo: define operators << and >> for "Messege"
-
-    out.device()->seek(0);          //jamp to start block
-    out << quint16(Data.size() - sizeof(quint16));
-    socket->write(Data);
-    ui->messageEdit->clear();
-}
-void ChatClient::initConnection()
-{
-    socket = new QTcpSocket(this);
-    connect(socket, &QTcpSocket::readyRead, this, &ChatClient::slotReadyRead);
-    connect(socket, &QTcpSocket::disconnected, this, &ChatClient::slotDisconnect);
-}
-Message ChatClient::createMessage(QString nickame, QString text)
-{
-    return Message{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
 }
 
 void ChatClient::loadConfig(QString _path)
@@ -227,28 +154,7 @@ QJsonObject ChatClient::configToJson()
     return json;
 }
 
-//-------------window interface------------
-void ChatClient::on_nickNameLineEdit_returnPressed()
-{
-    client->setUserName(ui->nickNameLineEdit->text());
-}
-
-void ChatClient::on_serverIPLineEdit_returnPressed()
-{
-    server_address = ui->serverIPLineEdit->text();
-}
-
-void ChatClient::on_serverPortLineEdit_returnPressed()
-{
-    server_port = ui->serverPortLineEdit->text().toUInt();
-}
-
-void ChatClient::on_roomLineEdit_returnPressed()
-{
-    client->setRoomNum(ui->roomLineEdit->text().toUInt());
-}
-
-void ChatClient::on_connectButton_clicked()
+void ChatClient::keepCurrentConfig()
 {
     server_address = (ui->serverIPLineEdit->text());            //вынести в отдельную функцию или слот
     server_port = (ui->serverPortLineEdit->text().toUInt());    //для чтения и записи config использовать структуру, где формировать обьект конфига
@@ -257,80 +163,102 @@ void ChatClient::on_connectButton_clicked()
     client->setRoomNum(ui->roomLineEdit->text().toUInt());
 
     saveConfig(CONFIG_FILE_PATH);
-
-    if (socket->state() == QAbstractSocket::UnconnectedState)
-    {
-        if (client->getUserName().size() &&
-            server_address.size() &&
-            server_port)
-        {
-            socket->connectToHost(server_address, server_port);
-            //with async await if(socket->state() == QAbstractSocket::ConnectedState)
-            ui->connectButton->setText("Disconnect");
-            //and only after that change button title
-        }
-        else
-        {
-            ui->textBrowser->append("Fill your name and server address, please.");
-        }
-    }
-    else
-    {
-        socket->disconnectFromHost();
-        ui->connectButton->setText("Connect");
-        initConnection();
-    }
 }
+//-----Old start------------------------
+//void ChatClient::slotReadyRead()
+//{
+//    QDataStream in(socket);
+//    in.setVersion(QDataStream::Qt_6_2);
+//    if (in.status() == QDataStream::Ok)
+//    {
+//        //        QString str;
+//        //        in >> str;
+//        //        ui->textBrowser->append(str);
+//        for (;;)
+//        {
+//            //ToDo: looks like it sould be in separate thread, couse a waiting
+//            if (nextBlockSize == 0)
+//            {
+//                if (socket->bytesAvailable() < 2)
+//                {
+//                    break;
+//                }
+//                in >> nextBlockSize;
+//            }
+//            if (socket->bytesAvailable() < nextBlockSize)
+//            {
+//                break;
+//            }
+//            //strange conditionб warning
+//            Message msg;
+//            in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
+//
+//            nextBlockSize = 0;
+//            if (!msg.deleted)                //TODO Create printmessage function
+//            {
+//                //ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
+//            }
+//        }
+//    }
+//    else
+//    {
+//        //ui->textBrowser->append("Read error");
+//    }
+//}
 
-void ChatClient::on_roomButton_clicked()
-{
 
-}
+//void ChatClient::sendToServer(Message msg)
+//{
+//    Data.clear();
+//    QDataStream out(&Data, QIODevice::WriteOnly);
+//    out.setVersion(QDataStream::Qt_6_2);
+//
+//    out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // ToDo: define operators << and >> for "Messege"
+//
+//    out.device()->seek(0);          //jamp to start block
+//    out << quint16(Data.size() - sizeof(quint16));
+//    socket->write(Data);
+//    ui->messageEdit->clear();
+//}
 
-void ChatClient::on_sendButton_clicked()
-{
-    //Create message function
-    //Send message function
-    if (socket->state() == QAbstractSocket::ConnectedState)
-    {
-        sendToServer(createMessage(client->getUserName(), ui->messageEdit->text()));
-    }
-    else
-    {
-        ui->textBrowser->append("Not Connected to Server");
-        qDebug() << socket->state();
-    }
-}
-void ChatClient::on_lineEdit_returnPressed()
-{
-    on_sendButton_clicked();
-}
+//Message ChatClient::createMessage(QString nickame, QString text)
+//{
+//    return Message{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
+//}
 
 //-----Old finish------------------------
-// 
+
 //-----New start-------------------------
 void ChatClient::attemptConnection()
 {
-    // We ask the user for the address of the server, we use 127.0.0.1 (aka localhost) as default
-    const QString hostAddress = QInputDialog::getText(
-        this
-        , tr("Chose Server")
-        , tr("Server Address")
-        , QLineEdit::Normal
-        , QStringLiteral("127.0.0.1")
-    );
-    if (hostAddress.isEmpty())
-        return; // the user pressed cancel or typed nothing
-    // disable the connect button to prevent the user clicking it again
-    ui->connectButton->setEnabled(false);
-    // tell the client to connect to the host using the port 5555
-    client->connectToServer(QHostAddress(hostAddress), 5555);
+    if (client->socketInfo()->state() == QAbstractSocket::UnconnectedState)
+    {
+        // We ask the user for the address of the server, we use 127.0.0.1 (aka localhost) as default
+        const QString hostAddress = QInputDialog::getText(
+            this
+            , tr("Chose Server")
+            , tr("Server Address")
+            , QLineEdit::Normal
+            , server_address
+        );
+        if (hostAddress.isEmpty())
+            return; // the user pressed cancel or typed nothing
+        // disable the connect button to prevent the user clicking it again
+        // tell the client to connect to the host using the port 5555
+        client->connectToServer(QHostAddress(hostAddress), server_port);
+    }
+    else
+    {
+        client->disconnectFromHost();
+        //initConnection(); Снова связать рэдирид и делитпотом
+    }
 }
 
 void ChatClient::connectedToServer()
 {
+    ui->connectButton->setText("Disconnect");
     // once we connected to the server we ask the user for what username they would like to use
-    const QString newUsername = QInputDialog::getText(this, tr("Chose Username"), tr("Username"));
+    const QString newUsername = QInputDialog::getText(this, tr("Chose Username"), tr("Username"), QLineEdit::Normal, client->getUserName());
     if (newUsername.isEmpty()) {
         // if the user clicked cancel or typed nothing, we just disconnect from the server
         return client->disconnectFromHost();
@@ -399,27 +327,40 @@ void ChatClient::messageReceived(const QString& sender, const QString& text)
 
 void ChatClient::sendMessage()
 {
-    // we use the client to send the message that the user typed
-    client->sendMessage(ui->messageEdit->text());
-    // now we add the message to the list
-    // store the index of the new row to append to the model containing the messages
-    const int newRow = chat_model->rowCount();
-    // insert a row for the message
-    chat_model->insertRow(newRow);
-    // store the message in the model
-    chat_model->setData(chat_model->index(newRow, 0), ui->messageEdit->text());
-    // set the alignment for the message
-    chat_model->setData(chat_model->index(newRow, 0), int(Qt::AlignRight | Qt::AlignVCenter), Qt::TextAlignmentRole);
-    // clear the content of the message editor
-    ui->messageEdit->clear();
-    // scroll the view to display the new message
-    ui->chatView->scrollToBottom();
-    // reset the last printed username
-    last_user_name.clear();
+    if (client->socketInfo()->state() == QAbstractSocket::ConnectedState)
+    {
+        // we use the client to send the message that the user typed
+        client->sendMessage(ui->messageEdit->text());
+        // now we add the message to the list
+        // store the index of the new row to append to the model containing the messages
+        const int newRow = chat_model->rowCount();
+        // insert a row for the message
+        chat_model->insertRow(newRow);
+        // store the message in the model
+        chat_model->setData(chat_model->index(newRow, 0), ui->messageEdit->text());
+        // set the alignment for the message
+        chat_model->setData(chat_model->index(newRow, 0), int(Qt::AlignRight | Qt::AlignVCenter), Qt::TextAlignmentRole);
+        // clear the content of the message editor
+        ui->messageEdit->clear();
+        // scroll the view to display the new message
+        ui->chatView->scrollToBottom();
+        // reset the last printed username
+        last_user_name.clear();
+    }
+    else
+    {
+        const int newRow = chat_model->rowCount();
+        chat_model->insertRow(newRow);
+        chat_model->setData(chat_model->index(newRow, 0), "You are disconnected. Try reconnect, please...");
+        chat_model->setData(chat_model->index(newRow, 0), int(Qt::AlignCenter | Qt::AlignVCenter), Qt::TextAlignmentRole);
+        ui->chatView->scrollToBottom();
+        last_user_name.clear();
+    }
 }
 
 void ChatClient::disconnectedFromServer()
 {
+    ui->connectButton->setText("Connect");
     // if the client loses connection to the server
     // comunicate the event to the user via a message box
     QMessageBox::warning(this, tr("Disconnected"), tr("The host terminated the connection"));

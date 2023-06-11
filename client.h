@@ -21,7 +21,7 @@ private:
     ~Client();
 public:
     static Client* instance(QObject* parent = nullptr);
-
+    const QTcpSocket* socketInfo();
     //---------getters-----------
     const QString& getUserName();
     const QString& getUserPassword();
@@ -53,6 +53,7 @@ private slots:
     void onReadyRead();
 
 private:
+    void initSocket();
     void jsonReceived(const QJsonObject& doc);
 
 private:
@@ -62,7 +63,7 @@ private:
     quint16 room_number;
     QDateTime last_message_time = {};
     bool logged_in;
-
+    quint16 nextBlockSize = 0;  //the variable for keep size of reciving data
 };
 
 #endif // CLIENT_H
