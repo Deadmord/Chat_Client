@@ -10,9 +10,9 @@
 #include <QJsonArray>
 #include <QJsonParseError>
 #include <QFile>
-#include "entities.h"
 #include "client.h"
 #include "ui_ChatClient.h"
+#include "../Chat_Server/entites.h"
 
 const QString CONFIG_FILE_PATH = "./config.json";
 

@@ -1,4 +1,5 @@
 ﻿#include "ChatClient.h"
+#include "entities.h"
 
 ChatClient::ChatClient(QWidget *parent)
     : QMainWindow(parent)
@@ -53,12 +54,12 @@ void ChatClient::slotReadyRead()
             }
             //strange conditionб warning
             Message msg;
-            in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
+            //in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
 
             nextBlockSize = 0;
             if (!msg.deleted)                //TODO Create printmessage function
             {
-                ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
+                //ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
             }
         }
     }
@@ -80,7 +81,7 @@ void ChatClient::sendToServer(Message msg)
     QDataStream out(&Data, QIODevice::WriteOnly);
     out.setVersion(QDataStream::Qt_6_2);
 
-    out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // ToDo: define operators << and >> for "Messege"
+    //out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // ToDo: define operators << and >> for "Messege"
 
     out.device()->seek(0);          //jamp to start block
     out << quint16(Data.size() - sizeof(quint16));
@@ -95,7 +96,7 @@ void ChatClient::initConnection()
 }
 Message ChatClient::createMessage(QString nickame, QString text)
 {
-    return Message{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
+    return Message{ nickame, "2", QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
 }
 
 void ChatClient::loadConfig(QString _path)
