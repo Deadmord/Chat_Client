@@ -1,6 +1,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include <plog/Log.h> 
 #include <QMainWindow>
 #include <QObject>
 #include <QTcpSocket>
@@ -23,13 +24,13 @@ public:
     static Client* instance(QObject* parent = nullptr);
     const QTcpSocket* socketInfo();
     //---------getters-----------
-    const QString& getUserName();
+    const QString& getUserNickname();
     const QString& getUserPassword();
     quint16 getRoomNum();
     const QDateTime& getLastMessageTime();
 
     //---------setters-----------
-    void setUserName(QString userName);
+    void setUserNickname(QString userName);
     void setUserPassword(QString hostName);
     void setRoomNum(quint16 roomNum);
     void setLastMessageTime();
@@ -57,11 +58,14 @@ private:
     void jsonReceived(const QJsonObject& doc);
 
 private:
+
     QTcpSocket* client_socket;
-    QString user_name;
+    QString user_nickname;
     QString user_password;
-    quint16 room_number;
-    QDateTime last_message_time = {};
+    quint16 user_current_chat_room_number;
+    QPixmap user_picture_path;
+
+    const QString initiate_picture_path = "/ images / avatar.png";
     bool logged_in;
     quint16 nextBlockSize = 0;  //the variable for keep size of reciving data
 };

@@ -129,6 +129,9 @@ void Client::jsonReceived(const QJsonObject& docObj)
         // we notify of the user disconnection the userLeft signal
         emit userLeft(usernameVal.toString());
     }
+    user_picture_path = QPixmap(initiate_picture_path);
+    last_message_time = QDateTime();
+    PLOGI << "client " << this->getUserNickname() << " was created";
 }
 
 void Client::connectToServer(const QHostAddress& address, quint16 port)
@@ -188,18 +191,18 @@ void Client::onReadyRead()
 }
 
 //------------getters-----------
-const QString& Client::getUserName() {return user_name;}
+const QString& Client::getUserNickname() {return user_nickname;}
 
 const QString &Client::getUserPassword() {return user_password;}
 
-quint16 Client::getRoomNum() {return room_number;}
+quint16 Client::getRoomNum() {return user_current_chat_room_number;}
 
 const QDateTime &Client::getLastMessageTime() {return last_message_time;}
 
 //------------setters-----------
-void Client::setUserName(QString user_name_)
+void Client::setUserNickname(QString user_name_)
 {
-    this->user_name = user_name_;
+    this->user_nickname = user_name_;
 }
 
 void Client::setUserPassword(QString user_password_)
@@ -209,7 +212,7 @@ void Client::setUserPassword(QString user_password_)
 
 void Client::setRoomNum(quint16 room_number_)
 {
-    this->room_number = room_number_;
+    this->user_current_chat_room_number = room_number_;
 }
 
 void Client::setLastMessageTime()

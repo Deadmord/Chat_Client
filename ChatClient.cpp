@@ -1,31 +1,46 @@
 ﻿#include "ChatClient.h"
 
+#if defined (Q_OS_WIN) // Only valid if Qt was configured as a static build!
+#include <Windows.h>
+
+bool IsCurrentInputLanguageRTL(void)
+{
+    bool ret = false;
+    auto layout = GetKeyboardLayout(GetWindowThreadProcessId(GetForegroundWindow(), NULL));
+
+    auto lcid = MAKELCID(LOWORD(layout), SORT_DEFAULT);
+    LOCALESIGNATURE localesig;
+
+    // Windows XP and higher.
+    // Unicode subset bit fields: https://msdn.microsoft.com/en-us/library/windows/desktop/dd374090(v=vs.85).aspx
+    // Bit 123: Windows 2000 and later - Layout progress, horizontal from right to left.
+    if (GetLocaleInfoW(lcid, LOCALE_FONTSIGNATURE, (LPWSTR)&localesig, sizeof(localesig) / sizeof(WCHAR)) != 0)
+        ret = (localesig.lsUsb[3] & 0x08000000) != 0;
+
+    return ret;
+}
+#endif
+
 ChatClient::ChatClient(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::ChatClientUi())    // create the elements defined in the .ui file
-    , client(Client::instance())    // create the chat client
-    , chat_model(new QStandardItemModel(this)) // create the model to hold the messages
+    , ui(new Ui::ChatClientClass())
+    , client(Client::instance())
 {
     ui->setupUi(this);
-    // the model for the messages will have 1 column
-    chat_model->insertColumn(0);
-    // set the model as the data source vor the list view
-    ui->chatView->setModel(chat_model);
-    // connect the signals from the chat client to the slots in this ui
-    connect(client, &Client::connected, this, &ChatClient::connectedToServer);
-    connect(client, &Client::loggedIn, this, &ChatClient::loggedIn);
-    connect(client, &Client::loginError, this, &ChatClient::loginFailed);
-    connect(client, &Client::messageReceived, this, &ChatClient::messageReceived);
-    connect(client, &Client::disconnected, this, &ChatClient::disconnectedFromServer);
-    connect(client, &Client::errorSignal, this, &ChatClient::errorSlot);
-    connect(client, &Client::userJoined, this, &ChatClient::userJoined);
-    connect(client, &Client::userLeft, this, &ChatClient::userLeft);
-    // connect the connect button to a slot that will attempt the connection
-    connect(ui->connectButton, &QPushButton::clicked, this, &ChatClient::attemptConnection);
-    connect(ui->connectButton, &QPushButton::clicked, this, &ChatClient::keepCurrentConfig);
-    // connect the click of the "send" button and the press of the enter while typing to the slot that sends the message
-    connect(ui->sendButton, &QPushButton::clicked, this, &ChatClient::sendMessage);
-    connect(ui->messageEdit, &QLineEdit::returnPressed, this, &ChatClient::sendMessage);
+
+    ui->text_edit->setPlaceholderText("Enter message text here");
+
+    ui->stackedWidget->setCurrentIndex(2);
+
+
+    //connect(ui.plainTextEdit, &QPlainTextEdit::textChanged, this, &ChatClient::on_message_text_changed);
+    connect(ui->add_attach_button, &QPushButton::clicked, this, &ChatClient::on_attach_files);
+
+    connect(this, &ChatClient::new_message, ui->chat_listView, &MessageWView::onMessageAdded);
+
+    connect(ui->login_sign_in_button, &QPushButton::clicked, this, &ChatClient::on_sign_in_button_clicked);
+    connect(ui->send_button, &QPushButton::clicked, this, &ChatClient::on_sendButton_clicked);
+
 }
 
 ChatClient::~ChatClient()
@@ -34,16 +49,109 @@ ChatClient::~ChatClient()
     delete ui;
 }
 
+void ChatClient::on_log_in_button_clicked() 
+{
+    LogInStruct logIn_data_for_send = { ui->login_nickname_edit->text(), ui->login_password_edit->text()};    
+    //TODO sending logIn_data_for_send to server for checking
+}
+
+void ChatClient::on_sign_in_button_clicked()
+{
+    ui->profile_edit_save_button->setText("Save");
+    ui->profile_start_chating_button->setEnabled(false);
+    QPixmap pixmap("./images/avatar.png");
+
+    // Set the pixmap to the QLabel
+    ui->profile_image_lable->setPixmap(pixmap);
+    ui->stackedWidget->setCurrentIndex(3);
+}
+
 void ChatClient::startClient()
 {
     loadConfig(CONFIG_FILE_PATH);                       //loading configuration settings
+    ui->login_nickname_edit->setText(client.getUserNickname());
+    ui->login_password_edit->setText(client.getUserPassword());
+
     //saveConfig(CONFIG_FILE_PATH);
 
-    ui->serverIPLineEdit->setText(server_address);                  //вынести в функцию uiInit()
-    ui->serverPortLineEdit->setText(QString::number(server_port));
-    ui->nickNameLineEdit->setText(client->getUserName());
-    ui->passwordLineEdit->setText(client->getUserPassword());
-    ui->roomLineEdit->setText(QString::number(client->getRoomNum()));
+    //ui->serverIPLineEdit->setText(server_address);                  //вынести в функцию uiInit()
+    //ui->serverPortLineEdit->setText(QString::number(server_port));
+    //ui->nickNameLineEdit->setText(client.getUserName());
+    //ui->passwordLineEdit->setText(client.getUserPassword());
+    //ui->roomLineEdit->setText(QString::number(client.getRoomNum()));
+
+    initConnection();
+}
+
+void ChatClient::slotReadyRead()
+{
+    QDataStream in(socket);
+    in.setVersion(QDataStream::Qt_6_2);
+    if (in.status() == QDataStream::Ok)
+    {
+        //        QString str;
+        //        in >> str;
+        //        ui->textBrowser->append(str);
+        for (;;)
+        {
+            //ToDo: looks like it sould be in separate thread, couse a waiting
+            if (nextBlockSize == 0)
+            {
+                if (socket->bytesAvailable() < 2)
+                {
+                    break;
+                }
+                in >> nextBlockSize;
+            }
+            if (socket->bytesAvailable() < nextBlockSize)
+            {
+                break;
+            }
+            //strange conditionб warning
+            Message msg;
+            in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
+
+            nextBlockSize = 0;
+            if (!msg.deleted)                //TODO Create printmessage function
+            {
+                ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
+            }
+        }
+    }
+    else
+    {
+        ui->textBrowser->append("Read error");
+    }
+}
+
+void ChatClient::slotDisconnect()
+{
+    socket->deleteLater();
+    ui->textBrowser->append("Server disconnected!");
+}
+
+void ChatClient::sendToServer(Message msg)
+{
+    Data.clear();
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+
+    out << quint16(0) << msg.id << msg.time << msg.nickname << msg.deleted << msg.text; // ToDo: define operators << and >> for "Messege"
+
+    out.device()->seek(0);          //jamp to start block
+    out << quint16(Data.size() - sizeof(quint16));
+    socket->write(Data);
+    ui->lineEdit->clear();
+}
+void ChatClient::initConnection()
+{
+    socket = new QTcpSocket(this);
+    connect(socket, &QTcpSocket::readyRead, this, &ChatClient::slotReadyRead);
+    connect(socket, &QTcpSocket::disconnected, this, &ChatClient::slotDisconnect);
+}
+Message ChatClient::createMessage(QString nickame, QString text)
+{
+    return Message{ nickame, text, QDateTime::currentDateTime(), QUuid::createUuid().toString(), false };
 }
 
 void ChatClient::loadConfig(QString _path)
@@ -115,17 +223,17 @@ void ChatClient::configFromJson(const QJsonDocument& config_file_doc_)
         qWarning() << "Error FloodLimit reading";
 
     if (const QJsonValue v = config_file_doc_["User"]["Nickname"]; v.isString())
-        client->setUserName(v.toString());
+        client.setUserNickname(v.toString());
     else
         qWarning() << "Error LastRoomNumber reading";
 
     if (const QJsonValue v = config_file_doc_["User"]["Password"]; v.isString())
-        client->setUserPassword(v.toString());
+        client.setUserPassword(v.toString());
     else
         qWarning() << "Error LastRoomNumber reading";
 
     if (const QJsonValue v = config_file_doc_["User"]["LastRoomNumber"]; v.isDouble())
-        client->setRoomNum(v.toInt());
+        client.setRoomNum(v.toInt());
     else
         qWarning() << "Error LastRoomNumber reading";
 
@@ -144,9 +252,9 @@ QJsonObject ChatClient::configToJson()
     json["ServerAddress"] = server_address;
     json["ServerPort"] = server_port;
     json["FloodLimit"] = flood_limit;
-    user["Nickname"] = client->getUserName();
-    user["Password"] = client->getUserPassword();
-    user["LastRoomNumber"] = client->getRoomNum();
+    user["Nickname"] = client.getUserNickname();
+    user["Password"] = client.getUserPassword();
+    user["LastRoomNumber"] = client.getRoomNum();
     json["User"] = user;
     history["Path"] = msg_history_path;
     json["MessagesHistorySettings"] = history;
@@ -156,6 +264,7 @@ QJsonObject ChatClient::configToJson()
 
 void ChatClient::keepCurrentConfig()
 {
+    //client.setUserName(ui->nickNameLineEdit->text());
     server_address = (ui->serverIPLineEdit->text());            //вынести в отдельную функцию или слот
     server_port = (ui->serverPortLineEdit->text().toUInt());    //для чтения и записи config использовать структуру, где формировать обьект конфига
     client->setUserName(ui->nickNameLineEdit->text());
@@ -164,47 +273,6 @@ void ChatClient::keepCurrentConfig()
 
     saveConfig(CONFIG_FILE_PATH);
 }
-//-----Old start------------------------
-//void ChatClient::slotReadyRead()
-//{
-//    QDataStream in(socket);
-//    in.setVersion(QDataStream::Qt_6_2);
-//    if (in.status() == QDataStream::Ok)
-//    {
-//        //        QString str;
-//        //        in >> str;
-//        //        ui->textBrowser->append(str);
-//        for (;;)
-//        {
-//            //ToDo: looks like it sould be in separate thread, couse a waiting
-//            if (nextBlockSize == 0)
-//            {
-//                if (socket->bytesAvailable() < 2)
-//                {
-//                    break;
-//                }
-//                in >> nextBlockSize;
-//            }
-//            if (socket->bytesAvailable() < nextBlockSize)
-//            {
-//                break;
-//            }
-//            //strange conditionб warning
-//            Message msg;
-//            in >> msg.id >> msg.time >> msg.nickname >> msg.deleted >> msg.text;
-//
-//            nextBlockSize = 0;
-//            if (!msg.deleted)                //TODO Create printmessage function
-//            {
-//                //ui->textBrowser->append(msg.id + " " + msg.time.toString() + " " + msg.nickname + " :\t" + msg.text);
-//            }
-//        }
-//    }
-//    else
-//    {
-//        //ui->textBrowser->append("Read error");
-//    }
-//}
 
 
 //void ChatClient::sendToServer(Message msg)
@@ -229,6 +297,8 @@ void ChatClient::keepCurrentConfig()
 //-----Old finish------------------------
 
 //-----New start-------------------------
+
+
 void ChatClient::attemptConnection()
 {
     if (client->socketInfo()->state() == QAbstractSocket::UnconnectedState)
@@ -275,12 +345,7 @@ void ChatClient::attemptLogin(const QString& userName)
 
 void ChatClient::loggedIn()
 {
-    // once we successully log in we enable the ui to display and send messages
-    ui->sendButton->setEnabled(true);
-    ui->messageEdit->setEnabled(true);
-    ui->chatView->setEnabled(true);
-    // clear the user name record
-    last_user_name.clear();
+    //client.setRoomNum(ui->roomLineEdit->text().toUInt());
 }
 
 void ChatClient::loginFailed(const QString& reason)
@@ -391,6 +456,96 @@ void ChatClient::userJoined(const QString& username)
     // reset the last printed username
     last_user_name.clear();
 }
+
+void ChatClient::on_sendButton_clicked()
+{
+    if (ui->text_edit->toPlainText().isEmpty())
+        return;
+    if (!ui->send_button->isEnabled())
+        return;
+
+    static auto ID = 0ULL;
+    ++ID;
+
+    //const auto icon = ui.comboBox->itemIcon(ui.comboBox->currentIndex());
+    //const auto name = ui.comboBox->currentText();
+    const auto nickname = client.getUserNickname();
+    const auto text = ui->text_edit->toPlainText();
+    auto const is_RTL = IsCurrentInputLanguageRTL();
+
+    QPixmap pixmap("./images/avatar.png");
+    QIcon icon(pixmap);
+
+
+
+    Q_EMIT new_message(
+        QVariant::fromValue<messageItemPtr>
+        (
+            messageItemPtr{ new MessageItem(
+                //ID 
+                nickname
+                , text
+                , is_RTL
+                , ui->add_attach_button->property("attached").toStringList()
+                , icon) }
+        )
+    );
+
+    ui->add_attach_button->setText(QString("Attach files"));
+    ui->add_attach_button->setProperty("attached", {});
+    ui->text_edit->clear();
+
+    //Create message function
+    //Send message function
+    if (socket->state() == QAbstractSocket::ConnectedState)
+    {
+        //sendToServer(createMessage(client.getUserName(), ui->lineEdit->text()));
+    }
+    else
+    {
+        //ui->textBrowser->append("Not Connected to Server");
+        qDebug() << socket->state();
+    }
+}
+
+void ChatClient::on_attach_files()
+{
+    // browse for image files and get a multiple selection
+    auto const& file_names = QFileDialog::getOpenFileNames(this, tr("Select files..."), QDir::homePath(), tr("Images (*.png *.xpm *.jpg *.jpeg)"), nullptr, QFileDialog::Options(QFileDialog::ReadOnly));
+    if (file_names.isEmpty())
+    {
+        ui->add_attach_button->setText(QString("Attach files"));
+        ui->add_attach_button->setProperty("attached", {});
+        return;
+    }
+
+
+    if (file_names.size() > 3)
+    {
+        QMessageBox::warning(this, tr("Warning"), tr("You can attach up to 3 files!"));
+        return;
+    }
+
+    ui->add_attach_button->setText(QString("Attached %1 files").arg(file_names.size()));
+    ui->add_attach_button->setProperty("attached", file_names);
+}
+
+void ChatClient::on_image_clicked(const QString& image_path)
+{
+   /* ui.imgLabel->setPixmap(QPixmap(image_path));
+    ui.stackedWidget->setCurrentIndex(1);*/
+}
+
+void ChatClient::keyPressEvent(QKeyEvent* event_)
+{
+    /*if (event_->key() == Qt::Key_Escape)
+    {
+        ui.stackedWidget->setCurrentIndex(0);
+        return;
+    }
+    QMainWindow::keyPressEvent(event);*/
+}
+
 void ChatClient::userLeft(const QString& username)
 {
     // store the index of the new row to append to the model containing the messages

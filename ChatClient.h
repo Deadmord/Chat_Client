@@ -5,6 +5,9 @@
 #include <QTcpSocket>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QKeyEvent>
+#include <QIcon>
 #include <QHostAddress>
 #include <QTime>
 #include <QUuid>
@@ -16,11 +19,13 @@
 #include "entities.h"
 #include "client.h"
 #include "ui_ChatClient.h"
+#include "MessageItem.h"
+#include "MessageWView.h"
 
 const QString CONFIG_FILE_PATH = "./config.json";
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class ChatClientUi; };
+namespace Ui { class ChatClientClass; };
 QT_END_NAMESPACE
 
 class ChatClient : public QMainWindow
@@ -31,7 +36,20 @@ class ChatClient : public QMainWindow
 public:
     explicit ChatClient(QWidget *parent = nullptr);
     ~ChatClient();
+
+    ChatClient(const ChatClient&) = delete;
+    ChatClient(ChatClient&&) = delete;
+    const ChatClient& operator =(const ChatClient&) = delete;
+    ChatClient& operator = (ChatClient&&) = delete;
+
     void startClient();
+
+Q_SIGNALS:
+    void new_message(const QVariant& msg);
+
+public slots:
+    void slotReadyRead();
+    void slotDisconnect();
 
 private:
     Message createMessage(QString nickame, QString text);
@@ -42,6 +60,19 @@ private:
     void configFromJson(const QJsonDocument& config_json_);
     QJsonObject configToJson();
 
+private Q_SLOTS:
+    /*void on_sendButton_clicked();
+    void on_attach_files();
+    void on_image_clicked(const QString& image_path);*/
+
+    void on_connectButton_clicked();
+    void on_roomButton_clicked();
+    void on_lineEdit_returnPressed();
+
+    void on_nickNameLineEdit_returnPressed();
+    void on_serverIPLineEdit_returnPressed();
+    void on_serverPortLineEdit_returnPressed();
+    void on_roomLineEdit_returnPressed();
 private slots:
     void attemptConnection();
     void connectedToServer();
@@ -56,9 +87,28 @@ private slots:
     void errorSlot(QAbstractSocket::SocketError socketError);
     void keepCurrentConfig();
 
+    //-----LogInW-----
+    void on_log_in_button_clicked();
+    void on_sign_in_button_clicked();
+
+    //-----ChatListW-----
+
+    //-----ChatW-----
+    void on_sendButton_clicked();
+    void on_attach_files();
+    void on_image_clicked(const QString& image_path);
+
+protected:
+
+    void keyPressEvent(QKeyEvent* event) override;
+
 private:
-    Ui::ChatClientUi *ui;
-    Client* client;
+    Ui::ChatClientClass *ui;
+    QTcpSocket* socket;
+    Client& client;
+    QByteArray Data;
+    //Ui::ChatClientUi* ui;
+    //Client* client;
     QStandardItemModel* chat_model;
     QString last_user_name;
 
