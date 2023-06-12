@@ -1,8 +1,11 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
+#include <QStandardItemModel>
 #include <QTcpSocket>
+#include <QInputDialog>
 #include <QMessageBox>
+#include <QHostAddress>
 #include <QTime>
 #include <QUuid>
 #include <QJsonObject>
@@ -17,26 +20,22 @@
 const QString CONFIG_FILE_PATH = "./config.json";
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class ChatClientClass; };
+namespace Ui { class ChatClientUi; };
 QT_END_NAMESPACE
 
 class ChatClient : public QMainWindow
 {
     Q_OBJECT
+    Q_DISABLE_COPY(ChatClient)
 
 public:
-    ChatClient(QWidget *parent = nullptr);
+    explicit ChatClient(QWidget *parent = nullptr);
     ~ChatClient();
     void startClient();
 
-public slots:
-    void slotReadyRead();
-    void slotDisconnect();
-
 private:
     Message createMessage(QString nickame, QString text);
-    void sendToServer(Message msg);
-    void initConnection();
+
     //-------Config-file-functions-------
     void loadConfig(QString _path);
     void saveConfig(QString _path);
@@ -44,25 +43,27 @@ private:
     QJsonObject configToJson();
 
 private slots:
-    void on_connectButton_clicked();
-    void on_roomButton_clicked();
-    void on_sendButton_clicked();
-    void on_lineEdit_returnPressed();
-
-    void on_nickNameLineEdit_returnPressed();
-    void on_serverIPLineEdit_returnPressed();
-    void on_serverPortLineEdit_returnPressed();
-    void on_roomLineEdit_returnPressed();
+    void attemptConnection();
+    void connectedToServer();
+    void attemptLogin(const QString& userName);
+    void loggedIn();
+    void loginFailed(const QString& reason);
+    void messageReceived(const QString& sender, const QString& text);
+    void sendMessage();
+    void disconnectedFromServer();
+    void userJoined(const QString& username);
+    void userLeft(const QString& username);
+    void errorSlot(QAbstractSocket::SocketError socketError);
+    void keepCurrentConfig();
 
 private:
-    Ui::ChatClientClass *ui;
-    QTcpSocket* socket;
-    Client& client;
-    QByteArray Data;
-    quint16 nextBlockSize = 0;
+    Ui::ChatClientUi *ui;
+    Client* client;
+    QStandardItemModel* chat_model;
+    QString last_user_name;
 
-    QString server_address;         //
-    quint16 server_port;            //
-    quint16 flood_limit;            //
-    QString msg_history_path;       //
+    QString server_address;         
+    quint16 server_port;            
+    quint16 flood_limit;            
+    QString msg_history_path;       
 };
