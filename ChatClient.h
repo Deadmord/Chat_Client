@@ -3,6 +3,9 @@
 #include <QtWidgets/QMainWindow>
 #include <QTcpSocket>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QKeyEvent>
+#include <QIcon>
 #include <QTime>
 #include <QUuid>
 #include <QJsonObject>
@@ -13,6 +16,8 @@
 #include "entities.h"
 #include "client.h"
 #include "ui_ChatClient.h"
+#include "MessageItem.h"
+#include "MessageWView.h"
 
 const QString CONFIG_FILE_PATH = "./config.json";
 
@@ -25,9 +30,18 @@ class ChatClient : public QMainWindow
     Q_OBJECT
 
 public:
-    ChatClient(QWidget *parent = nullptr);
+    explicit ChatClient(QWidget *parent = nullptr);
     ~ChatClient();
+
+    ChatClient(const ChatClient&) = delete;
+    ChatClient(ChatClient&&) = delete;
+    const ChatClient& operator =(const ChatClient&) = delete;
+    ChatClient& operator = (ChatClient&&) = delete;
+
     void startClient();
+
+Q_SIGNALS:
+    void new_message(const QVariant& msg);
 
 public slots:
     void slotReadyRead();
@@ -43,18 +57,19 @@ private:
     void configFromJson(const QJsonDocument& config_json_);
     QJsonObject configToJson();
 
-private slots:
+private Q_SLOTS:
+    /*void on_sendButton_clicked();
+    void on_attach_files();
+    void on_image_clicked(const QString& image_path);*/
+
     void on_connectButton_clicked();
     void on_roomButton_clicked();
-    void on_sendButton_clicked();
     void on_lineEdit_returnPressed();
 
     void on_nickNameLineEdit_returnPressed();
     void on_serverIPLineEdit_returnPressed();
     void on_serverPortLineEdit_returnPressed();
     void on_roomLineEdit_returnPressed();
-
-public Q_SLOTS:
 
     //-----LogInW-----
     void on_log_in_button_clicked();
@@ -63,9 +78,13 @@ public Q_SLOTS:
     //-----ChatListW-----
 
     //-----ChatW-----
-    //void on_send_button_clicked();
-    //void on_attach_files();
-    //void on_image_clicked(const QString& image_path);
+    void on_sendButton_clicked();
+    void on_attach_files();
+    void on_image_clicked(const QString& image_path);
+
+protected:
+
+    void keyPressEvent(QKeyEvent* event) override;
 
 private:
     Ui::ChatClientClass *ui;

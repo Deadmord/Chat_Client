@@ -1,5 +1,25 @@
 ﻿#include "ChatClient.h"
 
+#if defined (Q_OS_WIN) // Only valid if Qt was configured as a static build!
+#include <Windows.h>
+
+bool IsCurrentInputLanguageRTL(void)
+{
+    bool ret = false;
+    auto layout = GetKeyboardLayout(GetWindowThreadProcessId(GetForegroundWindow(), NULL));
+
+    auto lcid = MAKELCID(LOWORD(layout), SORT_DEFAULT);
+    LOCALESIGNATURE localesig;
+
+    // Windows XP and higher.
+    // Unicode subset bit fields: https://msdn.microsoft.com/en-us/library/windows/desktop/dd374090(v=vs.85).aspx
+    // Bit 123: Windows 2000 and later - Layout progress, horizontal from right to left.
+    if (GetLocaleInfoW(lcid, LOCALE_FONTSIGNATURE, (LPWSTR)&localesig, sizeof(localesig) / sizeof(WCHAR)) != 0)
+        ret = (localesig.lsUsb[3] & 0x08000000) != 0;
+
+    return ret;
+}
+#endif
 
 ChatClient::ChatClient(QWidget *parent)
     : QMainWindow(parent)
@@ -7,9 +27,20 @@ ChatClient::ChatClient(QWidget *parent)
     , client(Client::instance())
 {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
+
+    ui->text_edit->setPlaceholderText("Enter message text here");
+
+    ui->stackedWidget->setCurrentIndex(2);
+
+
+    //connect(ui.plainTextEdit, &QPlainTextEdit::textChanged, this, &ChatClient::on_message_text_changed);
+    connect(ui->add_attach_button, &QPushButton::clicked, this, &ChatClient::on_attach_files);
+
+    connect(this, &ChatClient::new_message, ui->chat_listView, &MessageWView::onMessageAdded);
 
     connect(ui->login_sign_in_button, &QPushButton::clicked, this, &ChatClient::on_sign_in_button_clicked);
+    connect(ui->send_button, &QPushButton::clicked, this, &ChatClient::on_sendButton_clicked);
+
 }
 
 ChatClient::~ChatClient()
@@ -294,6 +325,42 @@ void ChatClient::on_roomButton_clicked()
 
 void ChatClient::on_sendButton_clicked()
 {
+    if (ui->text_edit->toPlainText().isEmpty())
+        return;
+    if (!ui->send_button->isEnabled())
+        return;
+
+    static auto ID = 0ULL;
+    ++ID;
+
+    //const auto icon = ui.comboBox->itemIcon(ui.comboBox->currentIndex());
+    //const auto name = ui.comboBox->currentText();
+    const auto nickname = client.getUserNickname();
+    const auto text = ui->text_edit->toPlainText();
+    auto const is_RTL = IsCurrentInputLanguageRTL();
+
+    QPixmap pixmap("./images/avatar.png");
+    QIcon icon(pixmap);
+
+
+
+    Q_EMIT new_message(
+        QVariant::fromValue<messageItemPtr>
+        (
+            messageItemPtr{ new MessageItem(
+                //ID 
+                nickname
+                , text
+                , is_RTL
+                , ui->add_attach_button->property("attached").toStringList()
+                , icon) }
+        )
+    );
+
+    ui->add_attach_button->setText(QString("Attach files"));
+    ui->add_attach_button->setProperty("attached", {});
+    ui->text_edit->clear();
+
     //Create message function
     //Send message function
     if (socket->state() == QAbstractSocket::ConnectedState)
@@ -306,6 +373,45 @@ void ChatClient::on_sendButton_clicked()
         qDebug() << socket->state();
     }
 }
+
+void ChatClient::on_attach_files()
+{
+    // browse for image files and get a multiple selection
+    auto const& file_names = QFileDialog::getOpenFileNames(this, tr("Select files..."), QDir::homePath(), tr("Images (*.png *.xpm *.jpg *.jpeg)"), nullptr, QFileDialog::Options(QFileDialog::ReadOnly));
+    if (file_names.isEmpty())
+    {
+        ui->add_attach_button->setText(QString("Attach files"));
+        ui->add_attach_button->setProperty("attached", {});
+        return;
+    }
+
+
+    if (file_names.size() > 3)
+    {
+        QMessageBox::warning(this, tr("Warning"), tr("You can attach up to 3 files!"));
+        return;
+    }
+
+    ui->add_attach_button->setText(QString("Attached %1 files").arg(file_names.size()));
+    ui->add_attach_button->setProperty("attached", file_names);
+}
+
+void ChatClient::on_image_clicked(const QString& image_path)
+{
+   /* ui.imgLabel->setPixmap(QPixmap(image_path));
+    ui.stackedWidget->setCurrentIndex(1);*/
+}
+
+void ChatClient::keyPressEvent(QKeyEvent* event_)
+{
+    /*if (event_->key() == Qt::Key_Escape)
+    {
+        ui.stackedWidget->setCurrentIndex(0);
+        return;
+    }
+    QMainWindow::keyPressEvent(event);*/
+}
+
 void ChatClient::on_lineEdit_returnPressed()
 {
     on_sendButton_clicked();

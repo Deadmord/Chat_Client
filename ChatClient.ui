@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="LogInW">
        <layout class="QGridLayout" name="gridLayout">
@@ -222,7 +222,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QListView" name="chat_listView"/>
+         <widget class="MessageWView" name="chat_listView"/>
         </item>
         <item>
          <widget class="QWidget" name="widget_4" native="true">
@@ -418,6 +418,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MessageWView</class>
+   <extends>QListView</extends>
+   <header>messagewview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
