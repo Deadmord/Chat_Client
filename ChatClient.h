@@ -63,7 +63,6 @@ private:
     QString last_user_name;
 
     QString server_address;         
-    quint16 server_port;            
-    quint16 flood_limit;            
+    quint16 server_port;             
     QString msg_history_path;       
 };

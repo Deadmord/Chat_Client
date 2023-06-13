@@ -109,11 +109,6 @@ void ChatClient::configFromJson(const QJsonDocument& config_file_doc_)
     else
         qWarning() << "Error ServerPort reading";
 
-    if (const QJsonValue v = config_json["FloodLimit"]; v.isDouble())
-        flood_limit = v.toInt();
-    else
-        qWarning() << "Error FloodLimit reading";
-
     if (const QJsonValue v = config_file_doc_["User"]["Nickname"]; v.isString())
         client->setUserName(v.toString());
     else
@@ -143,7 +138,6 @@ QJsonObject ChatClient::configToJson()
 
     json["ServerAddress"] = server_address;
     json["ServerPort"] = server_port;
-    json["FloodLimit"] = flood_limit;
     user["Nickname"] = client->getUserName();
     user["Password"] = client->getUserPassword();
     user["LastRoomNumber"] = client->getRoomNum();
