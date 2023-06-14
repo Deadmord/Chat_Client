@@ -2,46 +2,73 @@
 #define CLIENT_H
 
 #include <QMainWindow>
+#include <QObject>
+#include <QTcpSocket>
 #include <QTime>
+#include <QDataStream>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonParseError>
 
-#include <plog/Log.h> 
+#include "MessageItem.h"
 
-class Client        //singleton
+class Client : public QObject        //singleton
 {
+    Q_OBJECT
+        Q_DISABLE_COPY(Client)
+private:
+    Client(QObject* parent = nullptr);
+    ~Client();
 public:
-    static Client& instance(QString user_nickname_ = nullptr, QString user_password_ = nullptr, quint16 user_current_chat_room_number_ = 0)
-    {
-        static Client inst(user_nickname_, user_password_, user_current_chat_room_number_);
-        return inst;
-    };
-
+    static Client* instance(QObject* parent = nullptr);
+    const QTcpSocket* socketInfo();
     //---------getters-----------
-    const QString& getUserNickname();
-    const QString& getUserPassword();
-    quint16 getRoomNum();
-    const QDateTime& getLastMessageTime();
+    const QString&  getUserNickname();
+    const QString&  getUserPassword();
+    quint16         getRoomNum();
+    const QString&  getUserAvatarPath();
+    int             getUserRating();
 
     //---------setters-----------
-    void setUserNickname(QString userName);
+    void setUserName(QString userName);
     void setUserPassword(QString hostName);
     void setRoomNum(quint16 roomNum);
-    void setLastMessageTime();
+    void setUserAvatarPath(QString path_);
+    void setUserRating(int raiting_);
+
+signals:
+    void connected();
+    void disconnected();
+    void loggedIn();
+    void loginError(const QString& reason);
+    void messageReceived(const MessageItem& msg_);
+    void errorSignal(QAbstractSocket::SocketError socket_error);
+    void userJoined(const QString& username);
+    void userLeft(const QString& username);
+
+public slots:
+    void connectToServer(const QHostAddress& address, quint16 port);
+    void login(const QString& userNickname_, const QString& userPassword_);
+    void sendMessage(const QString& text);
+    void disconnectFromHost();
+private slots:
+    void onReadyRead();
 
 private:
-    Client(QString user_nickname_, QString user_password_, quint16 user_current_chat_room_number_);
-    ~Client();
-    Client(Client const&) = delete;
-    Client& operator= (Client const&) = delete;
+    void initSocket();
+    void jsonReceived(const QJsonObject& doc);
 
 private:
-    QString user_nickname;
-    QString user_password;
-    quint16 user_current_chat_room_number;
-    QDateTime last_message_time; //todo delelte
-    QPixmap user_picture_path;
-
-    const QString initiate_picture_path = "/ images / avatar.png";
-
+    QTcpSocket*     client_socket;
+    QString         user_nickname;
+    QString         user_password;
+    quint16         user_cur_room_number = 0;
+    QString         user_avatar_path = "./images/avatar.png";
+    int             user_rating = 0;
+    bool            logged_in;
+    quint16         nextBlockSize = 0;  //the variable for keep size of reciving data
 };
 
 #endif // CLIENT_H

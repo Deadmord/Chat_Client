@@ -43,7 +43,7 @@ public:
 		message_file_list(std::move(message_file_list)),
 		message_avatar(avatar_.isNull() ? getAvatarIcon(0) : avatar_)
 	{
-		message_is_own = (message_nickname_ == EXAMPLENAME);
+		message_is_own = (message_nickname == EXAMPLENAME);
 		message_image_list.clear();
 		for (const auto& path : message_file_list)
 		{
@@ -125,6 +125,19 @@ public:
 	[[nodiscard]] auto const& getImageCount() const { return message_image_count; }
 
 	[[nodiscard]] auto isRtl() const { return message_is_rtl; }
+
+
+	//QVariant toVariant() const
+	//{
+	//	QVariant variant;
+	//	variant.setValue(*this);
+	//	return variant;
+	//}
+
+	//MessageItem fromVariant(const QVariant& variant)
+	//{
+	//	return variant.value<MessageItem>();
+	//}
 
 Q_SIGNALS:
 	void avatar_changed();

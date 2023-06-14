@@ -10,9 +10,6 @@ struct Message {
     bool deleted;
 };
 
-struct LogInStruct {
-    QString log_in_nickname;
-    QString log_in_password;
-};
+
 
 #endif // ENTITIES_H

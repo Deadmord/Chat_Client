@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>515</width>
+    <width>593</width>
     <height>335</height>
    </rect>
   </property>
@@ -18,8 +18,25 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
+      <widget class="QWidget" name="StartW">
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QPushButton" name="start_app_button">
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Start application</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="LogInW">
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="1">
@@ -138,6 +155,136 @@
            </size>
           </property>
          </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="ProfileW">
+       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,3">
+        <item>
+         <widget class="QWidget" name="widget_7" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="4,1,5,0">
+           <item>
+            <widget class="QLabel" name="profile_image_lable">
+             <property name="text">
+              <string>image_lable</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="profile_raiting_text">
+             <property name="text">
+              <string>rating_lable</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="profile_start_chating_button">
+             <property name="maximumSize">
+              <size>
+               <width>80</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Start chating</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,3,3,7,0">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <spacer name="verticalSpacer_data_top">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_2" native="true">
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="0">
+               <widget class="QLabel" name="profile_nickname_lable">
+                <property name="text">
+                 <string>Nickname</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="profile_nickname_edit"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_3" native="true">
+             <layout class="QFormLayout" name="formLayout_4">
+              <item row="0" column="0">
+               <widget class="QLabel" name="profile_password_lable">
+                <property name="text">
+                 <string>Password </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="profile_password_edit"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_data_bottom">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item alignment="Qt::AlignRight">
+            <widget class="QPushButton" name="profile_edit_save_button">
+             <property name="maximumSize">
+              <size>
+               <width>50</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Edit</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -276,136 +423,6 @@
                </widget>
               </item>
              </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="ProfileW">
-       <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,3">
-        <item>
-         <widget class="QWidget" name="widget_7" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="4,1,5,0">
-           <item>
-            <widget class="QLabel" name="profile_image_lable">
-             <property name="text">
-              <string>image_lable</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>rating_lable</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="profile_start_chating_button">
-             <property name="maximumSize">
-              <size>
-               <width>80</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Start chating</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="widget" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,3,3,7,0">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <item>
-            <spacer name="verticalSpacer_data_top">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_2" native="true">
-             <layout class="QFormLayout" name="formLayout_3">
-              <item row="0" column="0">
-               <widget class="QLabel" name="profile_nickname_lable">
-                <property name="text">
-                 <string>Nickname</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="profile_nickname_edit"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_3" native="true">
-             <layout class="QFormLayout" name="formLayout_4">
-              <item row="0" column="0">
-               <widget class="QLabel" name="profile_password_lable">
-                <property name="text">
-                 <string>Password </string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="profile_password_edit"/>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer_data_bottom">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item alignment="Qt::AlignRight">
-            <widget class="QPushButton" name="profile_edit_save_button">
-             <property name="maximumSize">
-              <size>
-               <width>50</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Edit</string>
-             </property>
             </widget>
            </item>
           </layout>

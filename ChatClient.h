@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QTcpSocket>
+//#include <QInputDialog>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QKeyEvent>
@@ -18,6 +19,7 @@
 #include "ui_ChatClient.h"
 #include "MessageItem.h"
 #include "MessageWView.h"
+#include "ConfigService.h"
 
 const QString CONFIG_FILE_PATH = "./config.json";
 
@@ -38,42 +40,20 @@ public:
     const ChatClient& operator =(const ChatClient&) = delete;
     ChatClient& operator = (ChatClient&&) = delete;
 
-    void startClient();
-
 Q_SIGNALS:
     void new_message(const QVariant& msg);
 
-public slots:
-    void slotReadyRead();
-    void slotDisconnect();
-
-private:
-    Message createMessage(QString nickame, QString text);
-    void sendToServer(Message msg);
-    void initConnection();
-    //-------Config-file-functions-------
-    void loadConfig(QString _path);
-    void saveConfig(QString _path);
-    void configFromJson(const QJsonDocument& config_json_);
-    QJsonObject configToJson();
-
 private Q_SLOTS:
-    /*void on_sendButton_clicked();
-    void on_attach_files();
-    void on_image_clicked(const QString& image_path);*/
 
-    void on_connectButton_clicked();
-    void on_roomButton_clicked();
-    void on_lineEdit_returnPressed();
-
-    void on_nickNameLineEdit_returnPressed();
-    void on_serverIPLineEdit_returnPressed();
-    void on_serverPortLineEdit_returnPressed();
-    void on_roomLineEdit_returnPressed();
+    //-----CtartW-----
+    void onStartAppClicked();
 
     //-----LogInW-----
     void on_log_in_button_clicked();
     void on_sign_in_button_clicked();
+
+    //-----ProfileW
+    void on_start_chatting_clicked();
 
     //-----ChatListW-----
 
@@ -82,19 +62,23 @@ private Q_SLOTS:
     void on_attach_files();
     void on_image_clicked(const QString& image_path);
 
+private slots:
+    void attemptConnection();
+    void connectedToServer();
+    void loginFailed(const QString& reason);
+    void loggedIn();
+    void messageReceived(const MessageItem& msg_);
+
+
+    void disconnectedFromServer();
+
 protected:
 
     void keyPressEvent(QKeyEvent* event) override;
 
 private:
     Ui::ChatClientClass *ui;
-    QTcpSocket* socket;
-    Client& client;
-    QByteArray Data;
-    quint16 nextBlockSize = 0;
+    Client* client;
 
-    QString server_address;         //
-    quint16 server_port;            //
-    quint16 flood_limit;            //
-    QString msg_history_path;       //
+    ConfigData config_data;
 };

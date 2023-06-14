@@ -105,7 +105,9 @@
     <ResourceCompile Include="ChatClient.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="client.h" />
+    <QtMoc Include="client.h" />
+    <QtMoc Include="UserItem.h" />
+    <QtMoc Include="ConfigService.h" />
     <ClInclude Include="entities.h" />
     <QtMoc Include="MessageItem.h" />
     <QtMoc Include="MessageWView.h" />

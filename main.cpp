@@ -10,7 +10,6 @@ int main(int argc, char* argv[])
     PLOGD << "CLient Application Start";
     QApplication a(argc, argv);
     ChatClient w;
-    w.startClient();
     w.show();
     return a.exec();
 }
