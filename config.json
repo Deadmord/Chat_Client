@@ -1,5 +1,4 @@
 {
-    "FloodLimit": 5,
     "MessagesHistorySettings": {
         "Path": "./history"
     },
