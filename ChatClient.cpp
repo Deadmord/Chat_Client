@@ -28,10 +28,12 @@ ChatClient::ChatClient(QWidget* parent)
     , config_data()
 {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
+    //ui->stackedWidget->setCurrentIndex(0);
+    ui->stackedWidget->setCurrentIndex(3);
 
     //Connections with view
     connect(this, &ChatClient::new_message, ui->chat_listView, &MessageWView::onMessageAdded);
+    connect(this, &ChatClient::new_chat, ui->chatList_listView, &ChatWView::onChatAdded);
 
     //connect(ui.plainTextEdit, &QPlainTextEdit::textChanged, this, &ChatClient::on_message_text_changed);
     //StartW
@@ -43,6 +45,9 @@ ChatClient::ChatClient(QWidget* parent)
 
     //ProfileW
     connect(ui->profile_start_chating_button, &QPushButton::clicked, this, &ChatClient::on_start_chatting_clicked);
+
+    //ChatListW
+    connect(ui->chatList_add_chat_button, &QPushButton::clicked, this, &ChatClient::onAddChatButtonClicked);
 
     //ChatRoomW
     connect(ui->send_button, &QPushButton::clicked, this, &ChatClient::on_sendButton_clicked);
@@ -69,7 +74,22 @@ void ChatClient::onStartAppClicked() {
 
 void ChatClient::on_start_chatting_clicked() {
     ui->text_edit->setPlaceholderText("Enter message text here");
-    ui->stackedWidget->setCurrentIndex(4);
+    ui->stackedWidget->setCurrentIndex(3);
+}
+
+void ChatClient::onAddChatButtonClicked()
+{
+    Q_EMIT new_chat(
+        QVariant::fromValue<chatItemPtr>
+        (
+            chatItemPtr{ new ChatItem(
+                1
+                , "name"
+                , "description"
+                , "lable"
+                , true) }
+        )
+    );
 };
 
 void ChatClient::on_log_in_button_clicked() 

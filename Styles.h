@@ -11,6 +11,14 @@ QListView { background-color: white; background-image: url(:/mainWindow/resource
 )";
 
 
+//For ChatWView
+static const QString  VIEW_CHAT_STYLE_SHEET = R"(
+QMenu::item{ background-color: rgb(0, 170, 0); color: rgb(255, 255, 255); }
+QMenu::item:selected { background-color: rgb(0, 85, 127); color: rgb(0, 255, 255);}
+QListView { background-color: white;} 
+)";
+
+
 //For MessageWDelegate
 static constexpr int	SHADOW_OFFSET{ 5 };
 static constexpr int	TEXTBOX_TOP_MARGIN{ 10 };
@@ -59,3 +67,10 @@ static const QFont		TIME_FONT{ "Segoe UI", 8, QFont::Light };
 static const QFont		LIKES_FONT{ "Segoe UI", 10, QFont::DemiBold };
 //Also for MessageWView
 static const QFont		MESSAGE_FONT{ "Titilium Web", 12, QFont::Normal };
+
+//ChatWView
+static const QFont		CHAT_FONT{"Titilium Web", 14, QFont::Bold};
+
+static QColor			HOVERED_CHAT_COLOR{224, 255, 255};
+static QColor			NORMAL_CHAT_COLOR{255, 182, 193};
+static QColor			DESCRIPTION_COLOR {255, 255, 224};

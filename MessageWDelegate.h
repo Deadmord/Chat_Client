@@ -8,7 +8,7 @@
 #include "MessageItem.h"
 #include "MessageWModel.h"
 
-class messageItem;
+class MessageItem;
 class MessageWDelegate final : public QItemDelegate
 {
 	Q_OBJECT

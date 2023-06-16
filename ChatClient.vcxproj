@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{37A28814-6DD0-4780-9AD4-716049A82D7F}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
@@ -90,6 +90,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChatWDelegate.cpp" />
+    <ClCompile Include="ChatWModel.cpp" />
+    <ClCompile Include="ChatWView.cpp" />
     <ClCompile Include="MessageWDelegate.cpp" />
     <ClCompile Include="MessageWModel.cpp" />
     <ClCompile Include="MessageWView.cpp" />
@@ -108,6 +111,10 @@
     <QtMoc Include="client.h" />
     <QtMoc Include="UserItem.h" />
     <QtMoc Include="ConfigService.h" />
+    <QtMoc Include="ChatItem.h" />
+    <QtMoc Include="ChatWModel.h" />
+    <QtMoc Include="ChatWView.h" />
+    <QtMoc Include="ChatWDelegate.h" />
     <ClInclude Include="entities.h" />
     <QtMoc Include="MessageItem.h" />
     <QtMoc Include="MessageWView.h" />

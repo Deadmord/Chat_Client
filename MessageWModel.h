@@ -8,7 +8,7 @@ class MessageWModel final : public QAbstractListModel
 {
 	Q_OBJECT
 
-		friend class messageView;
+		friend class MessageWView;
 
 public:
 	enum Role

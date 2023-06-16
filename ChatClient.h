@@ -14,11 +14,16 @@
 #include <QJsonArray>
 #include <QJsonParseError>
 #include <QFile>
+
 #include "entities.h"
 #include "client.h"
 #include "ui_ChatClient.h"
 #include "MessageItem.h"
 #include "MessageWView.h"
+
+#include "ChatItem.h"
+#include "ChatWView.h"
+
 #include "ConfigService.h"
 
 const QString CONFIG_FILE_PATH = "./config.json";
@@ -42,6 +47,7 @@ public:
 
 Q_SIGNALS:
     void new_message(const QVariant& msg);
+    void new_chat(const QVariant& msg);
 
 private Q_SLOTS:
 
@@ -56,6 +62,7 @@ private Q_SLOTS:
     void on_start_chatting_clicked();
 
     //-----ChatListW-----
+    void onAddChatButtonClicked();
 
     //-----ChatW-----
     void on_sendButton_clicked();

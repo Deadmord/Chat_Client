@@ -10,6 +10,11 @@ struct Message {
     bool deleted;
 };
 
+struct Topic {
+    qint32		topic_id;
+    QString		topic_name;
+};
+
 
 
 #endif // ENTITIES_H
