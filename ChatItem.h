@@ -45,8 +45,8 @@ public:
 	[[nodiscard]] auto getChatRoomDescription() { return this->chat_room_description; };
 	void setChatRoomDescription(const QString& val_) { chat_room_description = val_; };
 
-	[[nodiscard]] auto getChatRoomTopicID() { return this->chat_room_topic_name; };
-	void setChatRoomTopicID(const QString& val_) { chat_room_topic_name = val_; };
+	[[nodiscard]] auto getChatRoomTopicName() { return this->chat_room_topic_name; };
+	void setChatRoomTopicName(const QString& val_) { chat_room_topic_name = val_; };
 
 	[[nodiscard]] auto getChatRoomIsPrivate() { return this->chat_room_is_private; };
 	void setChatRoomIsPrivate(bool val_) { chat_room_is_private = val_; };

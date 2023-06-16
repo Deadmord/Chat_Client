@@ -15,7 +15,6 @@ QSize ChatWDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex co
 
 	const int added_height = CONTENT_MARGINS.y() * 2;
 	const QFontMetrics fm{ CHAT_FONT };
-
 	return { option.rect.width(), fm.height() + added_height };
 }
 
@@ -26,8 +25,13 @@ void ChatWDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 	const auto private_chat = chat->getChatRoomIsPrivate();
 	const auto hovered_chat = chat->isHovered();
 
-	QRect body_rect = option.rect;
-	QRect descr_rect = { body_rect.width() - 100, body_rect.height() + 10, body_rect.width() - 50, body_rect.height() - 20};
+
+	QRect body_rect = option.rect.adjusted(0,0,0,0);
+
+	//Description rect
+	const QFontMetrics fm{ CHAT_DESCR_FONT };
+	const int descr_width = fm.horizontalAdvance(chat->getChatRoomTopicName(), chat->getChatRoomTopicName().size());
+	QRect descr_rect = body_rect.adjusted(body_rect.width() - 10 - descr_width, 10, -10, -10);
 
 
 	/// drawing lambdas
@@ -40,7 +44,7 @@ void ChatWDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 		painter->drawRect(body_rect);
 
 		//hovered_chat ? painter->setBrush(QColor(255, 0, 0)) : painter->setBrush(QColor(0, 255, 0));
-		hovered_chat ? painter->setFont(QFont("Titilium Web", 14, QFont::Bold)) : painter->setFont(QFont("Titilium Web", 14, QFont::Normal));
+		hovered_chat ? painter->setFont(QFont(CHAT_HOVER_FONT)) : painter->setFont(QFont(CHAT_FONT));
 		//painter->setFont(QFont("Titilium Web", 14, QFont::Bold));
 
 		QRect messageRect = body_rect.adjusted(CONTENT_MARGINS.x(), CONTENT_MARGINS.y(), option.rect.width(), option.rect.height());
@@ -48,24 +52,20 @@ void ChatWDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 	};
 
 	//draw action
-	auto const draw_description = [&]()
+	auto const draw_lable = [&]()
 	{
 		if (hovered_chat) {
-			auto const description_color = DESCRIPTION_COLOR;
-			painter->setBrush(description_color);
+			painter->setBrush(DESCRIPTION_COLOR);
 
 			// Draw the rectangle with the background color
 			painter->drawRect(descr_rect);
-
-			painter->setFont(QFont("Titilium Web", 10, QFont::Bold));
-
-			QRect messageRect = descr_rect.adjusted(CONTENT_MARGINS.x(), 2, descr_rect.width(), descr_rect.height());
-			painter->drawText(messageRect, Qt::AlignLeft | Qt::AlignCenter, chat->getChatRoomDescription());
+			painter->setFont(QFont(CHAT_DESCR_FONT));
+			painter->drawText(descr_rect, Qt::AlignLeft | Qt::AlignCenter, chat->getChatRoomTopicName());
 		}
 	};
 
 
 	draw_chatname();
-	draw_description();
+	draw_lable();
 	painter->restore();
 };

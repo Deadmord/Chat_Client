@@ -69,7 +69,9 @@ static const QFont		LIKES_FONT{ "Segoe UI", 10, QFont::DemiBold };
 static const QFont		MESSAGE_FONT{ "Titilium Web", 12, QFont::Normal };
 
 //ChatWView
-static const QFont		CHAT_FONT{"Titilium Web", 14, QFont::Bold};
+static const QFont		CHAT_FONT{"Titilium Web", 14, QFont::Normal};
+static const QFont		CHAT_HOVER_FONT{"Titilium Web", 14, QFont::Bold};
+static const QFont		CHAT_DESCR_FONT {"Titilium Web", 10, QFont::Normal};
 
 static QColor			HOVERED_CHAT_COLOR{224, 255, 255};
 static QColor			NORMAL_CHAT_COLOR{255, 182, 193};

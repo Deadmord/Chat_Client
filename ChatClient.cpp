@@ -86,7 +86,7 @@ void ChatClient::onAddChatButtonClicked()
                 1
                 , "name"
                 , "description"
-                , "lable"
+                , "aaaaaaaaaaaaaaalable"
                 , true) }
         )
     );
