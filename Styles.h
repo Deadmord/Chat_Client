@@ -71,8 +71,10 @@ static const QFont		MESSAGE_FONT{ "Titilium Web", 12, QFont::Normal };
 //ChatWView
 static const QFont		CHAT_FONT{"Titilium Web", 14, QFont::Normal};
 static const QFont		CHAT_HOVER_FONT{"Titilium Web", 14, QFont::Bold};
-static const QFont		CHAT_DESCR_FONT {"Titilium Web", 10, QFont::Normal};
+static const QFont		CHAT_LABLE_FONT {"Titilium Web", 10, QFont::Normal};
+static const QFont		CHAT_DESCRIPTION_FONT {"Titilium Web", 6, QFont::Normal};
 
 static QColor			HOVERED_CHAT_COLOR{224, 255, 255};
 static QColor			NORMAL_CHAT_COLOR{255, 182, 193};
+static QColor			LABLE_COLOR {255, 255, 224}; 
 static QColor			DESCRIPTION_COLOR {255, 255, 224};

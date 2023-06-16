@@ -85,8 +85,8 @@ void ChatClient::onAddChatButtonClicked()
             chatItemPtr{ new ChatItem(
                 1
                 , "name"
-                , "description"
-                , "aaaaaaaaaaaaaaalable"
+                , "description sfdsg thgrthrthtrherh ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt ttttttttttttt ttttttttttttttt ttttttttttttt ttttttttttfffffffffffffftttt "
+                , "alable"
                 , true) }
         )
     );
