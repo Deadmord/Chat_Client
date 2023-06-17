@@ -8,11 +8,14 @@ struct Message {
     QDateTime time;
     QString id;
     bool deleted;
-
-//    #include <QUuid>
-//    void generateId() {
-//        id = QUuid::createUuid().toString();
-//    }
 };
+
+struct Topic {
+    qint32		topic_id;
+    QString		topic_name;
+};
+
+
+
 
 #endif // ENTITIES_H

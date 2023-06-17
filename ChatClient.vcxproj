@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{37A28814-6DD0-4780-9AD4-716049A82D7F}</ProjectGuid>
     <Keyword>QtVS_v304</Keyword>
-    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
     <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0.22621.0</WindowsTargetPlatformVersion>
     <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
   </PropertyGroup>
@@ -55,11 +55,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)</OutDir>
+    <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutDir>$(SolutionDir)..\$(Platform)\$(Configuration)\$(ProjectName)</OutDir>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -85,6 +90,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChatWDelegate.cpp" />
+    <ClCompile Include="ChatWModel.cpp" />
+    <ClCompile Include="ChatWView.cpp" />
+    <QtMoc Include="LikeItem.h" />
+    <ClCompile Include="MessageWDelegate.cpp" />
+    <ClCompile Include="MessageWModel.cpp" />
+    <ClCompile Include="MessageWView.cpp" />
+    <ClCompile Include="ServerC.cpp" />
     <None Include="packages.config" />
     <QtRcc Include="ChatClient.qrc" />
     <QtUic Include="ChatClient.ui" />
@@ -97,7 +110,18 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="client.h" />
+    <QtMoc Include="UserItem.h" />
+    <QtMoc Include="ConfigService.h" />
+    <QtMoc Include="ChatItem.h" />
+    <QtMoc Include="ChatWModel.h" />
+    <QtMoc Include="ChatWView.h" />
+    <QtMoc Include="ChatWDelegate.h" />
     <ClInclude Include="entities.h" />
+    <QtMoc Include="MessageItem.h" />
+    <QtMoc Include="MessageWView.h" />
+    <QtMoc Include="MessageWModel.h" />
+    <QtMoc Include="MessageWDelegate.h" />
+    <ClInclude Include="Styles.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

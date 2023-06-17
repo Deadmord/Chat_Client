@@ -14,6 +14,7 @@ Client* Client::instance(QObject* parent)
     static Client inst(parent);
     return &inst;
 }
+
 const QTcpSocket* Client::socketInfo()
 {
     return client_socket;
@@ -37,7 +38,14 @@ void Client::initSocket()
     connect(client_socket, &QTcpSocket::disconnected, this, [this]()->void {logged_in = false; });
 }
 
-void Client::login(const QString& userName, const QString& password)
+void Client::connectToServer(const QHostAddress& address, quint16 port)
+{
+    client_socket->connectToHost(address, port);
+    emit connected();
+}
+
+//Nuta - Added fild "password"
+void Client::login(const QString& userNickname_, const QString& userPassword_)
 {
     if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
         QByteArray buffer;
@@ -49,30 +57,8 @@ void Client::login(const QString& userName, const QString& password)
         // Create the JSON we want to send
         QJsonObject message;
         message[QStringLiteral("type")] = QStringLiteral("login");
-        message[QStringLiteral("username")] = userName;
-        message[QStringLiteral("password")] = password;
-        // send the JSON using QDataStream
-        const QByteArray jsonData = QJsonDocument(message).toJson(QJsonDocument::Compact);
-        clientStream << quint16(0) << jsonData;
-        clientStream.device()->seek(0); //go to beginning data storage
-        clientStream << quint16(buffer.size() - sizeof(quint16));
-        client_socket->write(buffer);
-    }
-}
-
-void Client::entryRoom()
-{
-    if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
-        QByteArray buffer;
-        buffer.clear();
-        // create a QDataStream for buffer operating 
-        QDataStream clientStream(&buffer, QIODevice::WriteOnly);
-        // set the version so that programs compiled with different versions of Qt can agree on how to serialise
-        clientStream.setVersion(QDataStream::Qt_6_5);
-        // Create the JSON we want to send
-        QJsonObject message;
-        message[QStringLiteral("type")] = QStringLiteral("roomEntry");
-        message[QStringLiteral("room")] = room_number;
+        message[QStringLiteral("username")] = userNickname_;
+        message[QStringLiteral("password")] = userPassword_;
         // send the JSON using QDataStream
         const QByteArray jsonData = QJsonDocument(message).toJson(QJsonDocument::Compact);
         clientStream << quint16(0) << jsonData;
@@ -98,7 +84,7 @@ void Client::sendMessage(const QString& text)
     message[QStringLiteral("text")] = text;
     // reserv size part in stream and send the JSON using QDataStream
     const QByteArray jsonData = QJsonDocument(message).toJson();
-    clientStream << quint16(0) << jsonData; 
+    clientStream << quint16(0) << jsonData;
     clientStream.device()->seek(0); //go to beginning data storage
     clientStream << quint16(buffer.size() - sizeof(quint16));
     client_socket->write(buffer);
@@ -126,6 +112,7 @@ void Client::jsonReceived(const QJsonObject& docObj)
         const bool loginSuccess = resultVal.toBool();
         if (loginSuccess) {
             // we logged in succesfully and we notify it via the loggedIn signal
+            //TODO here should recive a full data of the user. That client will use for showing
             emit loggedIn();
             return;
         }
@@ -136,6 +123,9 @@ void Client::jsonReceived(const QJsonObject& docObj)
     }
     else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message
         // we extract the text field containing the chat text
+        const QJsonValue textId = docObj.value(QLatin1String("id"));
+
+        // we extract the text field containing the chat text
         const QJsonValue textVal = docObj.value(QLatin1String("text"));
         // we extract the sender field containing the username of the sender
         const QJsonValue senderVal = docObj.value(QLatin1String("sender"));
@@ -143,8 +133,11 @@ void Client::jsonReceived(const QJsonObject& docObj)
             return; // the text field was invalid so we ignore
         if (senderVal.isNull() || !senderVal.isString())
             return; // the sender field was invalid so we ignore
+        const QJsonValue imageIdVal = docObj.value(QLatin1String("text"));
+        // we extract the sender field containing the username of the sender
         // we notify a new message was received via the messageReceived signal
-        emit messageReceived(senderVal.toString(), textVal.toString());
+        MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, imageIdVal.toString());
+        emit messageReceived(msg_);
     }
     else if (typeVal.toString().compare(QLatin1String("newuser"), Qt::CaseInsensitive) == 0) { // A user joined the chat
         // we extract the username of the new user
@@ -162,11 +155,6 @@ void Client::jsonReceived(const QJsonObject& docObj)
         // we notify of the user disconnection the userLeft signal
         emit userLeft(usernameVal.toString());
     }
-}
-
-void Client::connectToServer(const QHostAddress& address, quint16 port)
-{
-    client_socket->connectToHost(address, port);
 }
 
 void Client::onReadyRead()
@@ -220,19 +208,32 @@ void Client::onReadyRead()
     }
 }
 
+
+
+
+
+
+
+
+
+
+
 //------------getters-----------
-const QString& Client::getUserName() {return user_name;}
+const QString& Client::getUserNickname() { return user_nickname; }
 
-const QString &Client::getUserPassword() {return user_password;}
+const QString& Client::getUserPassword() { return user_password; }
 
-quint16 Client::getRoomNum() {return room_number;}
+quint16 Client::getRoomNum() { return user_cur_room_number; }
 
-const QDateTime &Client::getLastMessageTime() {return last_message_time;}
+const QString& Client::getUserAvatarPath() { return user_avatar_path; }
+
+int Client::getUserRating() { return user_rating; }
+
 
 //------------setters-----------
 void Client::setUserName(QString user_name_)
 {
-    this->user_name = user_name_;
+    this->user_nickname = user_name_;
 }
 
 void Client::setUserPassword(QString user_password_)
@@ -242,11 +243,16 @@ void Client::setUserPassword(QString user_password_)
 
 void Client::setRoomNum(quint16 room_number_)
 {
-    this->room_number = room_number_;
+    this->user_cur_room_number = room_number_;
 }
 
-void Client::setLastMessageTime()
+void Client::setUserAvatarPath( QString path_)
 {
-    this->last_message_time = QDateTime::currentDateTime();
+    this->user_avatar_path = path_;
+}
+
+void Client::setUserRating(int rating_)
+{
+    this->user_rating = rating_;
 }
 

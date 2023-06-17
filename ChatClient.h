@@ -1,11 +1,12 @@
 #pragma once
 
 #include <QtWidgets/QMainWindow>
-#include <QStandardItemModel>
 #include <QTcpSocket>
 #include <QInputDialog>
 #include <QMessageBox>
-#include <QHostAddress>
+#include <QFileDialog>
+#include <QKeyEvent>
+#include <QIcon>
 #include <QTime>
 #include <QUuid>
 #include <QJsonObject>
@@ -13,14 +14,23 @@
 #include <QJsonArray>
 #include <QJsonParseError>
 #include <QFile>
+#include <QList>
+
 #include "entities.h"
 #include "client.h"
 #include "ui_ChatClient.h"
+#include "MessageItem.h"
+#include "MessageWView.h"
+
+#include "ChatItem.h"
+#include "ChatWView.h"
+
+#include "ConfigService.h"
 
 const QString CONFIG_FILE_PATH = "./config.json";
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class ChatClientUi; };
+namespace Ui { class ChatClientClass; };
 QT_END_NAMESPACE
 
 class ChatClient : public QMainWindow
@@ -31,39 +41,75 @@ class ChatClient : public QMainWindow
 public:
     explicit ChatClient(QWidget *parent = nullptr);
     ~ChatClient();
-    void startClient();
 
-private:
-    Message createMessage(QString nickame, QString text);
+    ChatClient(const ChatClient&) = delete;
+    ChatClient(ChatClient&&) = delete;
+    const ChatClient& operator =(const ChatClient&) = delete;
+    ChatClient& operator = (ChatClient&&) = delete;
 
-    //-------Config-file-functions-------
-    void loadConfig(QString _path);
-    void saveConfig(QString _path);
-    void configFromJson(const QJsonDocument& config_json_);
-    QJsonObject configToJson();
+Q_SIGNALS:
+    void new_message(const QVariant& msg);
+    void new_chat(const QVariant& chat_);
+    void download_chat(const QVariantList& list_chats_);
+    void download_messages(const QVariantList& list_msg_);
+    void recivedLike(const QVariant& like_);
+
+
+private Q_SLOTS:
+
+    //-----CtartW-----
+    void onStartAppClicked();
+
+    //-----LogInW-----
+    void on_log_in_button_clicked();
+    void on_sign_in_button_clicked();
+
+    //-----ProfileW
+    void on_start_chatting_clicked();
+    void onSaveEditClicked();
+
+    //-----ChatListW-----
+    void onAddChatButtonClicked();
+    void onProfileClicked();
+
+    //-----ChatW-----
+    void on_sendButton_clicked();
+    void on_attach_files();
+    void on_image_clicked(const QString& image_path);
+    void onChatClicked(qint32 chat_id_);
+    void onReactionClick(const Likes& mes_user_likes_);
+
+
+    //-----AddRoom-----
+    void onCreateClicked();
+    void onCancelClicked();
 
 private slots:
     void attemptConnection();
     void connectedToServer();
-    void attemptLogin(const QString& userName, const QString& password);
-    void attemptEntryRoom();
-    void loggedIn();
     void loginFailed(const QString& reason);
-    void messageReceived(const QString& sender, const QString& text);
-    void sendMessage();
+    void loggedIn();
+    void userCreated(const UserItem& user_);
+    void userEdited(const UserItem& user_);
+    void createUserFailed(const QString& reason);
+
+    void messageReceived(const MessageItem& msg_);
+    void messageListReceived(const QList<MessageItem>& list_of_mess);
+    void roomCreated(const ChatItem& chat_);
+    void topicsComes(const QStringList& topics_);
+    void connectedToRoom(const QList<MessageItem>& list_of_mess);
+
+    void likeReceivedServer(const Likes& like_);
+
     void disconnectedFromServer();
-    void userJoined(const QString& username);
-    void userLeft(const QString& username);
-    void errorSlot(QAbstractSocket::SocketError socketError);
-    void keepCurrentConfig();
+
+protected:
+
+    void keyPressEvent(QKeyEvent* event) override;
 
 private:
-    Ui::ChatClientUi *ui;
+    Ui::ChatClientClass *ui;
     Client* client;
-    QStandardItemModel* chat_model;
-    QString last_user_name;
 
-    QString server_address;         
-    quint16 server_port;             
-    QString msg_history_path;       
+    ConfigData config_data;
 };
