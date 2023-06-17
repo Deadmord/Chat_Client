@@ -60,6 +60,28 @@ void Client::login(const QString& userName, const QString& password)
     }
 }
 
+void Client::entryRoom()
+{
+    if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
+        QByteArray buffer;
+        buffer.clear();
+        // create a QDataStream for buffer operating 
+        QDataStream clientStream(&buffer, QIODevice::WriteOnly);
+        // set the version so that programs compiled with different versions of Qt can agree on how to serialise
+        clientStream.setVersion(QDataStream::Qt_6_5);
+        // Create the JSON we want to send
+        QJsonObject message;
+        message[QStringLiteral("type")] = QStringLiteral("roomEntry");
+        message[QStringLiteral("room")] = room_number;
+        // send the JSON using QDataStream
+        const QByteArray jsonData = QJsonDocument(message).toJson(QJsonDocument::Compact);
+        clientStream << quint16(0) << jsonData;
+        clientStream.device()->seek(0); //go to beginning data storage
+        clientStream << quint16(buffer.size() - sizeof(quint16));
+        client_socket->write(buffer);
+    }
+}
+
 void Client::sendMessage(const QString& text)
 {
     if (text.isEmpty())
