@@ -1,5 +1,4 @@
-﻿  Reading Qt configuration (C:/Qt/6.5.0/msvc2019_64/bin/qmake)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018: The "ListQrc" task failed unexpectedly.
+﻿C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018: The "ListQrc" task failed unexpectedly.
 C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018: System.IO.FileNotFoundException: Could not find file 'C:\01_MasaStudying\21_FinalProject\project\InetChat\Chat_Client\ChatClient.qrc'.
 C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018: File name: 'C:\01_MasaStudying\21_FinalProject\project\InetChat\Chat_Client\ChatClient.qrc'
 C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
