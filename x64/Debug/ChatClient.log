@@ -1,14 +1,39 @@
-﻿C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018: The "ListQrc" task failed unexpectedly.
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018: System.IO.FileNotFoundException: Could not find file 'C:\01_MasaStudying\21_FinalProject\project\InetChat\Chat_Client\ChatClient.qrc'.
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018: File name: 'C:\01_MasaStudying\21_FinalProject\project\InetChat\Chat_Client\ChatClient.qrc'
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.Xml.XmlDownloadManager.GetStream(Uri uri, ICredentials credentials, IWebProxy proxy, RequestCachePolicy cachePolicy)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.Xml.XmlUrlResolver.GetEntity(Uri absoluteUri, String role, Type ofObjectToReturn)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.Xml.XmlTextReaderImpl.FinishInitUriString()
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.Xml.XmlReaderSettings.CreateReader(String inputUri, XmlParserContext inputContext)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at System.Xml.Linq.XDocument.Load(String uri, LoadOptions options)
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at InlineCode.ListQrc.Execute() in c:\Users\user\AppData\Local\Temp\oxw0m5o5.0.cs:line 60
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at Microsoft.Build.BackEnd.TaskExecutionHost.Microsoft.Build.BackEnd.ITaskExecutionHost.Execute()
-C:\Users\user\AppData\Local\QtMsBuild\rcc\qtrcc.targets(113,5): error MSB4018:    at Microsoft.Build.BackEnd.TaskBuilder.<ExecuteInstantiatedTask>d__26.MoveNext()
+﻿  uic ChatClient.ui
+  rcc ChatClient.qrc
+  moc LikeItem.h
+  moc ChatClient.h
+  moc client.h
+  moc UserItem.h
+  moc ConfigService.h
+  moc ChatItem.h
+  moc ChatWModel.h
+  moc ChatWView.h
+  moc ChatWDelegate.h
+  moc MessageItem.h
+  moc MessageWView.h
+  moc MessageWModel.h
+  moc MessageWDelegate.h
+  ChatWDelegate.cpp
+  ChatWModel.cpp
+  ChatWView.cpp
+  MessageWDelegate.cpp
+  MessageWModel.cpp
+  MessageWView.cpp
+  ChatClient.cpp
+  client.cpp
+  main.cpp
+  qrc_ChatClient.cpp
+  moc_LikeItem.cpp
+  moc_ChatClient.cpp
+  moc_client.cpp
+  moc_UserItem.cpp
+  moc_ConfigService.cpp
+  moc_ChatItem.cpp
+  moc_ChatWModel.cpp
+  moc_ChatWView.cpp
+  moc_ChatWDelegate.cpp
+  moc_MessageItem.cpp
+  moc_MessageWView.cpp
+  moc_MessageWModel.cpp
+  moc_MessageWDelegate.cpp
+  ChatClient.vcxproj -> C:\01_MasaStudying\21_FinalProject\project\InetChat\x64\Debug\ChatClient\ChatClient.exe
