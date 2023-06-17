@@ -37,31 +37,34 @@ public:
 
 	auto shared() { return sharedFromThis(); }
 
-	[[nodiscard]] auto getChatId() { return this->chat_room_id; };
+	[[nodiscard]] auto getChatId() const { return chat_room_id; };
 
-	[[nodiscard]] auto getChatRoomName() { return this->chat_room_name; };
+	[[nodiscard]] auto getChatRoomName() const  { return chat_room_name; };
 	void setChatRoomName(const QString& val_) { chat_room_name = val_; };
 
-	[[nodiscard]] auto getChatRoomDescription() { return this->chat_room_description; };
+	[[nodiscard]] auto getChatRoomDescription() const { return chat_room_description; };
 	void setChatRoomDescription(const QString& val_) { chat_room_description = val_; };
 
-	[[nodiscard]] auto getChatRoomTopicName() { return this->chat_room_topic_name; };
+	[[nodiscard]] auto getChatRoomTopicName() const { return chat_room_topic_name; };
 	void setChatRoomTopicName(const QString& val_) { chat_room_topic_name = val_; };
 
-	[[nodiscard]] auto getChatRoomIsPrivate() { return this->chat_room_is_private; };
+	[[nodiscard]] auto getChatRoomIsPrivate() const { return chat_room_is_private; };
 	void setChatRoomIsPrivate(bool val_) { chat_room_is_private = val_; };
 
-	[[nodiscard]] auto getChatRoomPassword() { return this->chat_room_password; };
+	[[nodiscard]] auto getChatRoomPassword() const { return chat_room_password; };
 	void setChatRoomPassword(const QString& val_) { chat_room_password = val_; };
 
-	[[nodiscard]] auto getChatRoomIsDeleted() { return this->chat_room_is_deleted; };
+	[[nodiscard]] auto getChatRoomIsDeleted() const { return chat_room_is_deleted; };
 	void setChatRoomIsDeleted(bool val_) { chat_room_is_deleted = val_; };
 
 	[[nodiscard]] auto isHovered() const { return chat_room_is_hovered; }
 	auto setIsHovered(const bool val) { chat_room_is_hovered = val; Q_EMIT hovered_changed(); }
 
-	[[nodiscard]] auto getChatRoomCurrRow() { return this->chat_current_row; };
+	[[nodiscard]] auto getChatRoomCurrRow() const { return this->chat_current_row; };
 	void setChatRoomCurrRow(int val_) { chat_current_row = val_; };
+
+	[[nodiscard]] auto const& getChatRoomCurrBox() const { return chat_current_box; }
+	auto setChatRoomCurrBox(const QRect val) { chat_current_box = val; }
 
 
 Q_SIGNALS:
@@ -80,9 +83,10 @@ private:
 	bool		chat_room_is_hovered {false};
 
 	int			chat_current_row{ -1 };
+	QRect		chat_current_box{};
 };
 
 
 using chatItemPtr = QSharedPointer<ChatItem>;
 using chatList = QList<chatItemPtr>;
-Q_DECLARE_METATYPE(chatItemPtr);
+Q_DECLARE_METATYPE(chatItemPtr); 

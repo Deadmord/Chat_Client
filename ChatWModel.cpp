@@ -13,7 +13,6 @@ void ChatWModel::clear()
 {
     beginResetModel();
     model_chats.clear();
-    //_id_to_msg.clear();
     endResetModel();
 }
 
@@ -23,7 +22,6 @@ void ChatWModel::addChat(const QVariant& new_chat_var_)
     {
         beginInsertRows(QModelIndex(), static_cast<int>(model_chats.size()), static_cast<int>(model_chats.size()));
         model_chats.emplaceBack(msg);
-        //_id_to_msg.insert(msg->getMesId(), msg);
         endInsertRows();
     }
 }
@@ -33,12 +31,11 @@ void ChatWModel::addChats(const QVariantList& new_chat_list_)
     if (!new_chat_list_.isEmpty())
     {
         beginInsertRows(QModelIndex(), static_cast<int>(model_chats.size()), static_cast<int>(model_chats.size() + new_chat_list_.size() - 1));
-        for (auto const& msg_var : new_chat_list_)
+        for (auto const& chat_var : new_chat_list_)
         {
-            if (const auto msg = msg_var.value<chatItemPtr>(); msg)
+            if (const auto msg = chat_var.value<chatItemPtr>(); msg)
             {
                 model_chats.emplaceBack(msg);
-                //_id_to_msg.insert(msg->getMesId(), msg);
             }
         }
         endInsertRows();

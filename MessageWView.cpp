@@ -32,17 +32,17 @@ void MessageWView::onMessageAdded(const QVariant& new_msg) const
 	const auto model = qobject_cast<MessageWModel*>(this->model());
 	if (!model)
 		return;
-
-	/////  Test for 1M messages !!!
-	//	QVariantList msg_list;
-	//	for ( int i = 0; i < 1000000; ++i )
-	//	{
-	//		msg_list << new_msg;
-	//	}
-	//	model->add_messages(msg_list);
 	
 	model->addMessage(new_msg);
 
+}
+
+void MessageWView::onMessagesAdded(const QVariantList& new_msg) const
+{
+	const auto model = qobject_cast<MessageWModel*>(this->model());
+	if (!model)
+		return;
+	model->addMessages(new_msg);
 }
 
 void MessageWView::onCustomContextMenuRequested(const QPoint& pos)

@@ -25,6 +25,7 @@ public:
 
 public Q_SLOTS:
 	void onChatAdded(const QVariant& new_msg) const;
+	void onChatsAdded(const QVariantList& msg_list_) const;
 	void onCustomContextMenuRequested(const QPoint& pos);
 	void onRowsInserted(const QModelIndex& parent, int first, int last);
 
@@ -34,7 +35,7 @@ Q_SIGNALS:
 protected:
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void mouseDoubleClickEvent(QMouseEvent* event) override;
-	void mouseReleaseEvent(QMouseEvent* event) override;
+	//void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
 	QModelIndex _last_index{};

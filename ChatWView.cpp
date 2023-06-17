@@ -33,16 +33,15 @@ void ChatWView::onChatAdded(const QVariant& new_msg) const
 	const auto model = qobject_cast<ChatWModel*>(this->model());
 	if (!model)
 		return;
-
-	/////  Test for 1M messages !!!
-	//	QVariantList msg_list;
-	//	for ( int i = 0; i < 1000000; ++i )
-	//	{
-	//		msg_list << new_msg;
-	//	}
-	//	model->add_messages(msg_list);
-
 	model->addChat(new_msg);
+}
+
+void ChatWView::onChatsAdded(const QVariantList& msg_list) const
+{
+	const auto model = qobject_cast<ChatWModel*>(this->model());
+	if (!model)
+		return;
+	model->addChats(msg_list);
 }
 
 void ChatWView::onCustomContextMenuRequested(const QPoint& pos)
@@ -95,52 +94,20 @@ void ChatWView::mouseMoveEvent(QMouseEvent* event)
 }
 
 void ChatWView::mouseDoubleClickEvent(QMouseEvent* event)
-{
-	/*if (const auto& model = qobject_cast<ChatWModel*>(this->model()))
-	{
-		auto const& item_index = indexAt(event->pos());
-		if (item_index.isValid())
-		{
-			const auto& msg = item_index.data(ChatWModel::ChatRole).value< chatItemPtr>();
-			const auto& image_rects = msg->getImageBoxRects();
-			int index = -1;
-			for (int i = 0; i < image_rects.size(); ++i)
-			{
-				if (image_rects.at(i).contains(event->pos()))
-				{
-					index = i;
-					break;
-				}
-			}
-			if (index >= 0)
-			{
-				Q_EMIT imageClicked(msg->getMesFilelist().at(index));
-			}
-		}
-	}
-	QListView::mouseDoubleClickEvent(event);*/
-}
-
-void ChatWView::mouseReleaseEvent(QMouseEvent* event)
-{
+{	
 	if (const auto& model = qobject_cast<ChatWModel*>(this->model()))
 	{
 		auto const& item_index = indexAt(event->pos());
 		if (item_index.isValid())
 		{
-			const auto& chat = item_index.data(ChatWModel::ChatRole).value<chatItemPtr>();
-			/*if (msg->getLikeButtRect().contains(event->pos()))
+			const auto& chat = item_index.data(ChatWModel::ChatRole).value< chatItemPtr>();
+			const auto& chat_rects = chat->getChatRoomCurrBox();
+			if (chat_rects.contains(event->pos()))
 			{
-				msg->changeMesLikes(1);
-				emit model->dataChanged(item_index, item_index);
+				Q_EMIT chatClicked(chat->getChatId());
 			}
-			else if (msg->getDislikeButtRect().contains(event->pos()))
-			{
-				msg->changeMesLikes(-1);
-				emit model->dataChanged(item_index, item_index);
-			}*/
 		}
 	}
-	QListView::mouseReleaseEvent(event);
+	QListView::mouseDoubleClickEvent(event);
 }
 

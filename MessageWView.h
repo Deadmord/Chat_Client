@@ -26,6 +26,7 @@ public:
 
 public Q_SLOTS:
 	void onMessageAdded(const QVariant& new_msg) const;
+	void onMessagesAdded(const QVariantList& new_msg) const;
 	void onCustomContextMenuRequested(const QPoint& pos);
 	void onRowsInserted(const QModelIndex& parent, int first, int last);
 

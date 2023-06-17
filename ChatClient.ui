@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="StartW">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -480,6 +480,138 @@
                </widget>
               </item>
              </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="AddChatRoomEdit">
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QWidget" name="widget_10" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="maximumSize">
+              <size>
+               <width>61</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Name         </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="add_room_name_edit"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_11" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="maximumSize">
+              <size>
+               <width>61</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Description</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTextEdit" name="add_room_descr_edit"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_13" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="maximumSize">
+              <size>
+               <width>61</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Topic name</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="add_room_combo_box"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="add_room_private_check_box">
+          <property name="text">
+           <string>Private</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_12" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_9">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="maximumSize">
+              <size>
+               <width>61</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Password   </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="add_room_password_edit"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="widget_9" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QPushButton" name="add_room_cancel_button">
+             <property name="text">
+              <string>Cancel</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="add_room_create_button">
+             <property name="text">
+              <string>Create</string>
+             </property>
             </widget>
            </item>
           </layout>

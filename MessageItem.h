@@ -32,11 +32,11 @@ public:
 
 	explicit MessageItem() : QObject(Q_NULLPTR) {};
 	explicit MessageItem(
-		QString message_nickname_,
-		QString message_text_,
-		const bool is_rtl_,
-		QStringList message_file_list_,
-		const QIcon& avatar_ = {}) : QObject(nullptr),
+		QString			message_nickname_,
+		QString			message_text_,
+		const bool		is_rtl_,
+		QStringList		message_file_list_,
+		const QIcon&	avatar_ = {}) : QObject(nullptr),
 		message_nickname(std::move(message_nickname_)),
 		message_text(std::move(message_text_)),
 		message_is_rtl(is_rtl_),

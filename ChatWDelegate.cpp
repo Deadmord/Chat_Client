@@ -83,6 +83,7 @@ void ChatWDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 
 		QRect messageRect = body_rect.adjusted(CONTENT_MARGINS.x(), CONTENT_MARGINS.y(), option.rect.width(), option.rect.height());
 		painter->drawText(messageRect, Qt::AlignLeft | Qt::AlignTop, chat->getChatRoomName());
+		chat->setChatRoomCurrBox(body_rect);
 	};
 
 	//draw lable

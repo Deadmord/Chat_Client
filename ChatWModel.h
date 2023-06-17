@@ -42,12 +42,12 @@ public:
 
 	using QAbstractListModel::dataChanged;
 
-	public Q_SLOT:
+public Q_SLOT:
 	void addChat(const QVariant& new_chat_var_);
-private Q_SLOTS:
-
-	void clear();
 	void addChats(const QVariantList& new_chat_list_);
+
+private Q_SLOTS:
+	void clear();
 
 private:
 

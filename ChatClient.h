@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QTcpSocket>
-//#include <QInputDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QKeyEvent>
@@ -14,6 +14,7 @@
 #include <QJsonArray>
 #include <QJsonParseError>
 #include <QFile>
+#include <QList>
 
 #include "entities.h"
 #include "client.h"
@@ -47,7 +48,9 @@ public:
 
 Q_SIGNALS:
     void new_message(const QVariant& msg);
-    void new_chat(const QVariant& msg);
+    void new_chat(const QVariant& chat_);
+    void download_chat(const QVariantList& list_chats_);
+    void download_messages(const QVariantList& list_msg_);
 
 private Q_SLOTS:
 
@@ -63,11 +66,17 @@ private Q_SLOTS:
 
     //-----ChatListW-----
     void onAddChatButtonClicked();
+    void onProfileClicked();
 
     //-----ChatW-----
     void on_sendButton_clicked();
     void on_attach_files();
     void on_image_clicked(const QString& image_path);
+    void onChatClicked(qint32 chat_id_);
+
+    //-----AddRoom-----
+    void onCreateClicked();
+    void onCancelClicked();
 
 private slots:
     void attemptConnection();
@@ -75,7 +84,9 @@ private slots:
     void loginFailed(const QString& reason);
     void loggedIn();
     void messageReceived(const MessageItem& msg_);
-
+    void roomCreated(const ChatItem& chat_);
+    void topicsComes(const QStringList& topics_);
+    void connectedToRoom(const QList<MessageItem>& list_of_mess);
 
     void disconnectedFromServer();
 
