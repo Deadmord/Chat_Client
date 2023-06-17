@@ -97,7 +97,6 @@
     <ClCompile Include="MessageWDelegate.cpp" />
     <ClCompile Include="MessageWModel.cpp" />
     <ClCompile Include="MessageWView.cpp" />
-    <ClCompile Include="ServerC.cpp" />
     <None Include="packages.config" />
     <QtRcc Include="ChatClient.qrc" />
     <QtUic Include="ChatClient.ui" />

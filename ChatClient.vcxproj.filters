@@ -49,9 +49,6 @@
     <ClCompile Include="client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ServerC.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MessageWView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
