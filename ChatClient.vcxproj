@@ -93,6 +93,7 @@
     <ClCompile Include="ChatWDelegate.cpp" />
     <ClCompile Include="ChatWModel.cpp" />
     <ClCompile Include="ChatWView.cpp" />
+    <QtMoc Include="LikeItem.h" />
     <ClCompile Include="MessageWDelegate.cpp" />
     <ClCompile Include="MessageWModel.cpp" />
     <ClCompile Include="MessageWView.cpp" />

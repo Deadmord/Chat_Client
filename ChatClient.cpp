@@ -33,12 +33,16 @@ ChatClient::ChatClient(QWidget* parent)
 
     //Connections with view
     connect(this, &ChatClient::new_message, ui->chat_listView, &MessageWView::onMessageAdded);
+    connect(this, &ChatClient::download_messages, ui->chat_listView, &MessageWView::onMessagesAdded);
+    connect(this, &ChatClient::recivedLike, ui->chat_listView, &MessageWView::onRecivedLike);
+
+
     connect(this, &ChatClient::new_chat, ui->chatList_listView, &ChatWView::onChatAdded);
     connect(this, &ChatClient::download_chat, ui->chatList_listView, &ChatWView::onChatsAdded);
-    connect(this, &ChatClient::download_messages, ui->chat_listView, &MessageWView::onMessagesAdded);
 
     connect(ui->chat_listView, &MessageWView::imageClicked, this, &ChatClient::on_image_clicked);
     connect(ui->chatList_listView, &ChatWView::chatClicked, this, &ChatClient::onChatClicked);
+    connect(ui->chat_listView, &MessageWView::makeUserReaction, this, &ChatClient::onReactionClick);
 
     //connect(ui.plainTextEdit, &QPlainTextEdit::textChanged, this, &ChatClient::on_message_text_changed);
     //StartW
@@ -164,7 +168,8 @@ void ChatClient::onChatClicked(qint32 chat_id_)
         QVariant::fromValue<messageItemPtr>
         (
             messageItemPtr{ new MessageItem(
-                "Lisa"
+                "1"
+                ,"Lisa"
                 , "Hello"
                 , false
                 , {})
@@ -173,7 +178,8 @@ void ChatClient::onChatClicked(qint32 chat_id_)
         QVariant::fromValue<messageItemPtr>
         (
             messageItemPtr{ new MessageItem(
-               "Anton"
+                "2"
+                , "Anton"
                 , "Hello"
                 , false
                 , {})
@@ -182,7 +188,8 @@ void ChatClient::onChatClicked(qint32 chat_id_)
         QVariant::fromValue<messageItemPtr>
         (
             messageItemPtr{ new MessageItem(
-               "Anton"
+                "3"
+                , "Anton"
                 , "םדדם"
                 , true
                 , {})
@@ -278,12 +285,12 @@ void ChatClient::on_sendButton_clicked()
         QVariant::fromValue<messageItemPtr>
         (
             messageItemPtr{ new MessageItem(
-                //ID 
-                nickname
+                "id"
+                , nickname
                 , text
                 , is_RTL
-                , ui->add_attach_button->property("attached").toStringList()
-                , icon) }
+                , "llll"
+                ) }
         )
     );
 
@@ -320,12 +327,6 @@ void ChatClient::on_image_clicked(const QString& image_path)
     ui.stackedWidget->setCurrentIndex(1);*/
 }
 
-void ChatClient::onLikeClicked(const QString& user_name, const QString& mess_id_, bool is_iked_)
-{
-    //TODO send to client data of likes
-}
-
-
 
 //TODO redefine
 void ChatClient::keyPressEvent(QKeyEvent* event_)
@@ -336,6 +337,14 @@ void ChatClient::keyPressEvent(QKeyEvent* event_)
         return;
     }
     QMainWindow::keyPressEvent(event);*/
+}
+
+void ChatClient::onReactionClick(const Likes& mes_user_likes_) 
+{
+    //TODO send to client data
+    //TODO delete
+    likeReceivedServer({ Like_enum::LIKE, "1", "Lisa"});
+
 }
 
 
@@ -489,11 +498,11 @@ void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
             QVariant::fromValue<messageItemPtr>
             (
                 messageItemPtr{ new MessageItem(
-                    mes_item.getMesNickname()
+                    mes_item.getMesId()
+                    , mes_item.getMesNickname()
                     , mes_item.getMesText()
                     , mes_item.isRtl()
-                    , mes_item.getMesFilelist()
-                    , mes_item.getMesAvatar()
+                    , mes_item.getMesMediaId()
                 ) }
             )
         );
@@ -509,22 +518,28 @@ void ChatClient::messageReceived(const MessageItem& msg_)
         QVariant::fromValue<messageItemPtr>
         (
             messageItemPtr{ new MessageItem(
-                //ID 
-                  msg_.getMesNickname()
+                msg_.getMesId()
+                , msg_.getMesNickname()
                 , msg_.getMesText()
                 , msg_.isRtl() //TODO how to understand for new messages. Seems it should be inside JSON on server
-                , msg_.getMesFilelist() //TODO change. Here wil just ID of the picture. Need to convert ATTACH
-                , msg_.getMesAvatar()) }  //TODO change. Here wil just ID of the picture. Need to convert AVATAR
+                , msg_.getMesMediaId() )} //TODO change. Here wil just ID of the picture. Need to convert ATTACH
+                //, msg_.getMesAvatar()) }  //TODO change. Here wil just ID of the picture. Need to convert AVATAR
         )
     );
 }
 
 ////If new likes/dislikes recieved
-void ChatClient::likesReceived(const QString& user_name, const QString& mess_id_, bool is_iked_)
+void ChatClient::likeReceivedServer(const Likes& like_)
 {
-
+    Q_EMIT recivedLike(
+        QVariant::fromValue<likeItemPtr>
+        (
+            likeItemPtr{ new Likes(
+                like_.getReaction()
+                , like_.getIdChat()
+                , like_.getuserNamet()) }
+    ));
 }
-
 
 
 //-----Others

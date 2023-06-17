@@ -7,5 +7,7 @@
         <file>images/avatarka_1.png</file>
         <file>images/avatarka_2.png</file>
         <file>images/avatarka_3.png</file>
+        <file>images/broken.png</file>
+        <file>images/heart.png</file>
     </qresource>
 </RCC>

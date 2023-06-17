@@ -51,6 +51,8 @@ Q_SIGNALS:
     void new_chat(const QVariant& chat_);
     void download_chat(const QVariantList& list_chats_);
     void download_messages(const QVariantList& list_msg_);
+    void recivedLike(const QVariant& like_);
+
 
 private Q_SLOTS:
 
@@ -74,7 +76,7 @@ private Q_SLOTS:
     void on_attach_files();
     void on_image_clicked(const QString& image_path);
     void onChatClicked(qint32 chat_id_);
-    void onLikeClicked(const QString& user_name, const QString& mess_id_, bool is_iked_);
+    void onReactionClick(const Likes& mes_user_likes_);
 
 
     //-----AddRoom-----
@@ -96,7 +98,7 @@ private slots:
     void topicsComes(const QStringList& topics_);
     void connectedToRoom(const QList<MessageItem>& list_of_mess);
 
-    void likesReceived(const QString& user_name, const QString& mess_id_, bool is_iked_);
+    void likeReceivedServer(const Likes& like_);
 
     void disconnectedFromServer();
 

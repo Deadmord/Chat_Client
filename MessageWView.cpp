@@ -45,6 +45,37 @@ void MessageWView::onMessagesAdded(const QVariantList& new_msg) const
 	model->addMessages(new_msg);
 }
 
+void MessageWView::onRecivedLike(const QVariant& like_) const
+{
+	const auto model = qobject_cast<MessageWModel*>(this->model());
+	if (model) {
+		QModelIndexList indexes;
+		for (int row = 0; row < model->rowCount(); ++row) {
+			QModelIndex index = model->index(row, 0);  // Assuming a single-column model
+			if (index.isValid()) {
+				indexes.append(index);
+			}
+		}
+
+		model->onAnotheLikeChanged(like_);
+
+		const auto like = like_.value<likeItemPtr>();
+		for (const QModelIndex& index : indexes) {
+			const auto& msg = index.data(MessageWModel::MessageRole).value<messageItemPtr>();
+			if (like->getIdChat() == msg->getMesId()) {
+				emit model->dataChanged(index, index);
+			}
+			else {
+			}
+
+		}
+	}
+
+	if (!model)
+		return;
+}
+
+
 void MessageWView::onCustomContextMenuRequested(const QPoint& pos)
 {
 	QModelIndexList indexes = selectionModel()->selectedIndexes();
@@ -114,7 +145,7 @@ void MessageWView::mouseDoubleClickEvent(QMouseEvent* event)
 			}
 			if (index >= 0)
 			{
-				Q_EMIT imageClicked(msg->getMesFilelist().at(index));
+				//Q_EMIT imageClicked(msg->getMesFilelist().at(index));
 			}
 		}
 	}
@@ -128,16 +159,16 @@ void MessageWView::mouseReleaseEvent(QMouseEvent* event)
 		auto const& item_index = indexAt(event->pos());
 		if (item_index.isValid())
 		{
-			const auto& msg = item_index.data(MessageWModel::MessageRole).value< messageItemPtr>();
+			const auto& msg = item_index.data(MessageWModel::MessageRole).value<messageItemPtr>();
 			if (msg->getLikeButtRect().contains(event->pos()))
 			{
-				msg->changeMesLikes(1);
-				emit model->dataChanged(item_index, item_index);
+				msg->setMesUserReaction(Like_enum::LIKE);
+				Q_EMIT makeUserReaction({ msg->getMesUserReaction(), msg->getMesId(), msg->getMesNickname()});
 			}
 			else if (msg->getDislikeButtRect().contains(event->pos()))
 			{
-				msg->changeMesLikes(-1);
-				emit model->dataChanged(item_index, item_index);
+				msg->setMesUserReaction(Like_enum::DISLIKE);
+				Q_EMIT makeUserReaction({ msg->getMesUserReaction(), msg->getMesId(), msg->getMesNickname() });
 			}
 		}
 	}

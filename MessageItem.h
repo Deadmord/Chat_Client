@@ -5,6 +5,7 @@
 #include <ranges>
 
 #include "Styles.h"
+#include "LikeItem.h"
 
 
 inline static QIcon getAvatarIcon(const int avatar_id)
@@ -16,7 +17,7 @@ inline static QIcon getAvatarIcon(const int avatar_id)
 	return default_icon;
 }
 
-//Q_DECLARE_METATYPE(QList<QPixmap>)
+Q_DECLARE_METATYPE(QList<QPixmap>)
 
 class MessageItem : public QObject, public QEnableSharedFromThis<MessageItem>
 {
@@ -26,31 +27,34 @@ public:
 
 	struct messageToSend {
 		QString message_text;
-		QList<QPixmap> message_attach;
-		quint16 message_room;
+		QString message_attach;
 	};
 
 	explicit MessageItem() : QObject(Q_NULLPTR) {};
 	explicit MessageItem(
+		QString			message_id_,
 		QString			message_nickname_,
 		QString			message_text_,
 		const bool		is_rtl_,
-		QStringList		message_file_list_,
+		QString			message_media_id_ = "",
+		listLikes	message_list_likes_ = {},
 		const QIcon&	avatar_ = {}) : QObject(nullptr),
+		message_id(std::move(message_id_)),
 		message_nickname(std::move(message_nickname_)),
 		message_text(std::move(message_text_)),
 		message_is_rtl(is_rtl_),
-		message_file_list(std::move(message_file_list)),
+		message_media_id(std::move(message_media_id_)),
+		message_list_likes(std::move(message_list_likes_)),
 		message_avatar(avatar_.isNull() ? getAvatarIcon(0) : avatar_)
 	{
 		message_is_own = (message_nickname == EXAMPLENAME);
-		message_image_list.clear();
+		/*message_image_list.clear();
 		for (const auto& path : message_file_list)
 		{
 			message_image_list.push_back(QPixmap(path).scaled(IMAGE_PREVIEW_SIZE_MAX, Qt::KeepAspectRatio));
 		}
-		message_image_count = static_cast<int>(message_image_list.size());
-		message_likes = 0;
+		message_image_count = static_cast<int>(message_image_list.size());*/
+		!message_list_likes.isEmpty() ? message_likes = message_list_likes.size() : 0;
 	};
 
 	~MessageItem() override = default;
@@ -60,6 +64,8 @@ public:
 	MessageItem& operator = (MessageItem&&) = delete;
 
 	auto shared() { return sharedFromThis(); }
+
+	[[nodiscard]] auto getMesId() const { return message_id; }
 
 	[[nodiscard]] auto getMesNickname() const { return message_nickname; }
 	auto setMesNickname(const QString val) { message_nickname = val; }
@@ -75,13 +81,20 @@ public:
 
 	[[nodiscard]] auto getMesLikes() const { return message_likes; }
 	auto setMesLikes(const int val) { message_likes = val; Q_EMIT likes_changed(); }
+	//Question: Why we use here Q_emit?
 
 	auto changeMesLikes(const int val) { message_likes += val; Q_EMIT likes_changed(); }
 
 	[[nodiscard]] auto isHovered() const { return message_is_hovered; }
 	auto setIsHovered(const bool val) { message_is_hovered = val; Q_EMIT hovered_changed(); }
 
-	[[nodiscard]] auto const& getMesFilelist() const { return message_file_list; }
+	[[nodiscard]] auto getMesUserReaction() const { return message_user_reaction; }
+	auto setMesUserReaction(const Like_enum val) { message_user_reaction = val; }
+
+	[[nodiscard]] auto getMesMediaId() const { return message_media_id; }
+	auto setMesMediaId(const QString val) { message_media_id = val; }
+
+	/*[[nodiscard]] auto const& getMesFilelist() const { return message_file_list; }
 	auto setMesFilelist(const QStringList& val)
 	{
 		message_image_list.clear();
@@ -92,13 +105,14 @@ public:
 	}
 
 	[[nodiscard]] auto const& getMesImagelist() const { return message_image_list; }
+	*/
 
 	[[nodiscard]] auto const& getMesAvatar() const { return message_avatar; }
 	auto setMesAvatar(const QIcon& val) { message_avatar = val; Q_EMIT  avatar_changed(); }
 
 	[[nodiscard]] auto getMesToSend() const
 	{
-		return messageToSend{ message_text, message_image_list , 1};
+		return messageToSend{ message_text, message_media_id };
 	}
 
 	[[nodiscard]] auto const& getCurrentRow() const { return message_current_row; }
@@ -121,23 +135,16 @@ public:
 	[[nodiscard]] auto const& getDislikeButtRect() const { return message_dislike_butt_rect; }
 	auto setDislikeButtRect(const QRect val) { message_dislike_butt_rect = val; }
 
+	auto addNewLike(const likeItemPtr val) { 
+		message_list_likes.emplaceBack(val);
+		message_likes = val->getReaction() == Like_enum::LIKE ? message_likes++: message_likes--;
+	}
 
-	[[nodiscard]] auto const& getImageCount() const { return message_image_count; }
+
+
+	//[[nodiscard]] auto const& getImageCount() const { return message_image_count; }
 
 	[[nodiscard]] auto isRtl() const { return message_is_rtl; }
-
-
-	//QVariant toVariant() const
-	//{
-	//	QVariant variant;
-	//	variant.setValue(*this);
-	//	return variant;
-	//}
-
-	//MessageItem fromVariant(const QVariant& variant)
-	//{
-	//	return variant.value<MessageItem>();
-	//}
 
 Q_SIGNALS:
 	void avatar_changed();
@@ -147,16 +154,21 @@ Q_SIGNALS:
 private:
 	bool			message_is_hovered{ false };
 
+	QString			message_id;
 	QString			message_nickname;
 	QString			message_text;
 	QIcon			message_avatar{};
 	bool			message_is_own{ false };
 	QDateTime		message_time_stamp{ QDateTime::currentDateTime() };
 
-	QList<QPixmap>	message_image_list {};
-	int				message_image_count{ 0 };
-	QStringList		message_file_list;
+	QString			message_media_id{};
+	//QList<QPixmap>	message_image_list {};
+	//int				message_image_count{ 0 };
+	//QStringList		message_file_list;
+	bool			message_is_rtl{ false };
 
+	listLikes		message_list_likes;
+	Like_enum		message_user_reaction{ Like_enum::NO_REACTION };
 	int				message_likes{ 0 };
 
 	QSize			message_current_text_box_size{};
@@ -165,9 +177,8 @@ private:
 	QList<QRect>	message_image_box_rects{};
 	QRect			message_like_butt_rect{};
 	QRect			message_dislike_butt_rect{};
-
-	bool			message_is_rtl{ false };
 	int				message_current_row{ -1 };
+
 };
 
 using messageItemPtr = QSharedPointer<MessageItem>;

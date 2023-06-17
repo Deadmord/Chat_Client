@@ -18,7 +18,7 @@ QSize MessageWDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex
 	const auto own_msg = msg->isOwn();
 
 	const int item_own_width = option.rect.width() * 3 / 4 - 20;
-	const int added_height = CONTENT_MARGINS.y() * 2 + AVATAR_SIZE.height() + TEXTBOX_TOP_MARGIN + SHADOW_OFFSET + msg->getImageCount() * (IMAGE_PREVIEW_SIZE_MAX.height() + IMAGE_PREVIEW_SPACING);
+	const int added_height = CONTENT_MARGINS.y() * 2 + AVATAR_SIZE.height() + TEXTBOX_TOP_MARGIN + SHADOW_OFFSET + IMAGE_PREVIEW_SIZE_MAX.height() + IMAGE_PREVIEW_SPACING;
 	const QRect available_text_box_rect = { option.rect.topLeft(), QSize{ item_own_width - CONTENT_MARGINS.x() * 2 - 10, option.rect.height() } };
 
 	const QFontMetrics fm{ MESSAGE_FONT };
@@ -235,7 +235,7 @@ void MessageWDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 
 	const auto& draw_attached_images = [&]()
 	{
-		if (!msg->getImageCount())
+		/*if (!msg->getImageCount())
 			return;
 
 		auto  start_point = text_rect.bottomLeft() + QPoint{ 0, IMAGE_PREVIEW_SPACING };
@@ -255,8 +255,8 @@ void MessageWDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 			painter->drawPixmap(start_point, px);
 			start_point += QPoint{ 0, px.height() + IMAGE_PREVIEW_SPACING };
 
-			msg->getImageBoxRects().push_back(px_rc);
-		}
+			msg->getImageBoxRects().push_back(px_rc);*/
+		//}
 	};
 
 	painter->setRenderHint(QPainter::TextAntialiasing);

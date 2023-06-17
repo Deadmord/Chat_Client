@@ -42,6 +42,7 @@ public:
 	using QAbstractListModel::endResetModel;
 
 	using QAbstractListModel::dataChanged;
+	void onAnotheLikeChanged(const QVariant& like_);
 
 public Q_SLOT:
 	void addMessage(const QVariant& new_msg_var_);

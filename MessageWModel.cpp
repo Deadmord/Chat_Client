@@ -73,6 +73,22 @@ messageItemPtr MessageWModel::getMessageFromId(const int id) const
     return model_id_to_msg.value(id);
 }
 
+void MessageWModel::onAnotheLikeChanged(const QVariant& like_) {
+
+    const auto like = like_.value<likeItemPtr>();
+    for (const messageItemPtr& msg_ : model_messages) {
+        if (like->getIdChat() == msg_->getMesId()) {
+            if (like->getReaction() == Like_enum::LIKE) {
+                msg_->changeMesLikes(1);
+            }
+            else {
+                msg_->changeMesLikes(-1);
+            }
+            msg_->addNewLike(like);
+        }
+    }
+}
+
 
 int MessageWModel::rowCount(const QModelIndex& parent) const
 {
