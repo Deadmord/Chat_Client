@@ -23,6 +23,7 @@ ChatClient::ChatClient(QWidget *parent)
     // connect the connect button to a slot that will attempt the connection
     connect(ui->connectButton, &QPushButton::clicked, this, &ChatClient::attemptConnection);
     connect(ui->connectButton, &QPushButton::clicked, this, &ChatClient::keepCurrentConfig);
+    connect(ui->roomButton, &QPushButton::clicked, this, &ChatClient::attemptEntryRoom);
     // connect the click of the "send" button and the press of the enter while typing to the slot that sends the message
     connect(ui->sendButton, &QPushButton::clicked, this, &ChatClient::sendMessage);
     connect(ui->messageEdit, &QLineEdit::returnPressed, this, &ChatClient::sendMessage);
@@ -265,6 +266,12 @@ void ChatClient::attemptLogin(const QString& userName, const QString& password)
 {
     // use the client to attempt a log in with the given username
     client->login(userName, password);
+}
+
+void ChatClient::attemptEntryRoom()
+{
+    // use the client to attempt a log in with the given username
+    client->entryRoom();
 }
 
 void ChatClient::loggedIn()

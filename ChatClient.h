@@ -46,6 +46,7 @@ private slots:
     void attemptConnection();
     void connectedToServer();
     void attemptLogin(const QString& userName, const QString& password);
+    void attemptEntryRoom();
     void loggedIn();
     void loginFailed(const QString& reason);
     void messageReceived(const QString& sender, const QString& text);
