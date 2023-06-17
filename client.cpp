@@ -157,7 +157,6 @@ void Client::jsonReceived(const QJsonObject& docObj)
     }
 }
 
-
 void Client::onReadyRead()
 {
     // prepare a container to hold the UTF-8 encoded JSON we receive from the socket
@@ -208,6 +207,16 @@ void Client::onReadyRead()
         break;
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 //------------getters-----------
 const QString& Client::getUserNickname() { return user_nickname; }

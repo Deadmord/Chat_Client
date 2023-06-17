@@ -33,9 +33,9 @@ public:
 
     auto shared() { return sharedFromThis(); }
 
-    auto getReaction() const { return reaction; };
-    auto getIdChat() const { return id_chat; };
-    auto getuserNamet() const { return user_name; };
+    auto getLikeReaction() const { return reaction; };
+    auto getLikeChatId() const { return id_chat; };
+    auto getLikeUserName() const { return user_name; };
 
 private:
     Like_enum   reaction;

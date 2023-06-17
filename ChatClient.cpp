@@ -327,7 +327,6 @@ void ChatClient::on_image_clicked(const QString& image_path)
     ui.stackedWidget->setCurrentIndex(1);*/
 }
 
-
 //TODO redefine
 void ChatClient::keyPressEvent(QKeyEvent* event_)
 {
@@ -535,9 +534,9 @@ void ChatClient::likeReceivedServer(const Likes& like_)
         QVariant::fromValue<likeItemPtr>
         (
             likeItemPtr{ new Likes(
-                like_.getReaction()
-                , like_.getIdChat()
-                , like_.getuserNamet()) }
+                like_.getLikeReaction()
+                , like_.getLikeChatId()
+                , like_.getLikeUserName()) }
     ));
 }
 

@@ -37,7 +37,7 @@ public:
 		QString			message_text_,
 		const bool		is_rtl_,
 		QString			message_media_id_ = "",
-		listLikes	message_list_likes_ = {},
+		listLikes		message_list_likes_ = {},
 		const QIcon&	avatar_ = {}) : QObject(nullptr),
 		message_id(std::move(message_id_)),
 		message_nickname(std::move(message_nickname_)),
@@ -137,7 +137,13 @@ public:
 
 	auto addNewLike(const likeItemPtr val) { 
 		message_list_likes.emplaceBack(val);
-		message_likes = val->getReaction() == Like_enum::LIKE ? message_likes++: message_likes--;
+		message_likes = val->getLikeReaction() == Like_enum::LIKE ? message_likes++: message_likes--;
+	}
+
+	[[nodiscard]] auto isLiked() {
+		for (const likeItemPtr& like : message_list_likes) {
+			like->getLikeUserName() == EXAMPLENAME ? true : false;
+		}
 	}
 
 

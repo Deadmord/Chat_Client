@@ -75,9 +75,6 @@
     <ClInclude Include="entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerC.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Styles.h">
       <Filter>Header Files</Filter>
     </ClInclude>

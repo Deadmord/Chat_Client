@@ -17,7 +17,7 @@
 class Client : public QObject        //singleton
 {
     Q_OBJECT
-        Q_DISABLE_COPY(Client)
+    Q_DISABLE_COPY(Client)
 private:
     Client(QObject* parent = nullptr);
     ~Client();
@@ -62,6 +62,7 @@ private:
 
 private:
     QTcpSocket*     client_socket;
+
     QString         user_nickname;
     QString         user_password;
     quint16         user_cur_room_number = 0;

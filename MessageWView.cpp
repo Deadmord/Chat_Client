@@ -62,7 +62,7 @@ void MessageWView::onRecivedLike(const QVariant& like_) const
 		const auto like = like_.value<likeItemPtr>();
 		for (const QModelIndex& index : indexes) {
 			const auto& msg = index.data(MessageWModel::MessageRole).value<messageItemPtr>();
-			if (like->getIdChat() == msg->getMesId()) {
+			if (like->getLikeChatId() == msg->getMesId()) {
 				emit model->dataChanged(index, index);
 			}
 			else {
@@ -74,7 +74,6 @@ void MessageWView::onRecivedLike(const QVariant& like_) const
 	if (!model)
 		return;
 }
-
 
 void MessageWView::onCustomContextMenuRequested(const QPoint& pos)
 {

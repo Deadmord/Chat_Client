@@ -77,8 +77,8 @@ void MessageWModel::onAnotheLikeChanged(const QVariant& like_) {
 
     const auto like = like_.value<likeItemPtr>();
     for (const messageItemPtr& msg_ : model_messages) {
-        if (like->getIdChat() == msg_->getMesId()) {
-            if (like->getReaction() == Like_enum::LIKE) {
+        if (like->getLikeChatId() == msg_->getMesId()) {
+            if (like->getLikeReaction() == Like_enum::LIKE) {
                 msg_->changeMesLikes(1);
             }
             else {

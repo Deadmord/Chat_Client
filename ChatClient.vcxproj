@@ -121,7 +121,6 @@
     <QtMoc Include="MessageWView.h" />
     <QtMoc Include="MessageWModel.h" />
     <QtMoc Include="MessageWDelegate.h" />
-    <ClInclude Include="ServerC.h" />
     <ClInclude Include="Styles.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
