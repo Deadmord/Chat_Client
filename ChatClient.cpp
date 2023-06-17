@@ -519,7 +519,7 @@ void ChatClient::messageReceived(const MessageItem& msg_)
     );
 }
 
-//If new likes/dislikes recieved
+////If new likes/dislikes recieved
 void ChatClient::likesReceived(const QString& user_name, const QString& mess_id_, bool is_iked_)
 {
 
