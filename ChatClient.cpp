@@ -80,9 +80,37 @@ ChatClient::~ChatClient()
     delete ui;
 }
 
+//-------------------------------BUTTONS-------------------------------
+//-----Start Page
 void ChatClient::onStartAppClicked() {
     attemptConnection();
 }
+
+//-----LogIn Page
+void ChatClient::on_log_in_button_clicked() 
+{
+    if (!ui->login_nickname_edit->text().isEmpty() && !ui->login_password_edit->text().isEmpty()) {
+        client->login(ui->login_nickname_edit->text(), ui->login_password_edit->text());
+
+        //TODO delete. Just for time
+        loggedIn();
+    }
+    else
+        QMessageBox::information(this, "Warning", "Please input all fields");
+}
+
+void ChatClient::on_sign_in_button_clicked()
+{
+    ui->profile_edit_save_button->setText("Save");
+    ui->profile_start_chating_button->setEnabled(false);
+    QPixmap pixmap("./images/avatar.png");
+
+    // Set the pixmap to the QLabel
+    ui->profile_image_lable->setPixmap(pixmap);
+    ui->stackedWidget->setCurrentIndex(2);
+}
+
+//-----Profile Page
 
 void ChatClient::on_start_chatting_clicked() {
     ui->text_edit->setPlaceholderText("Enter message text here");
@@ -115,6 +143,58 @@ void ChatClient::on_start_chatting_clicked() {
     Q_EMIT download_chat(listik);
 }
 
+void ChatClient::onSaveEditClicked() {
+    if (ui->profile_edit_save_button->text() == "Save") {
+        //TODO send to client changed info
+    }
+    else {
+        //TODO send to client info about new user
+    }
+}
+
+//-----ChatList Page
+
+void ChatClient::onChatClicked(qint32 chat_id_)
+{
+    client->setRoomNum(chat_id_);
+    //TODO send to server new current room
+
+    //TODO Delete
+    auto listik = QVariantList{
+        QVariant::fromValue<messageItemPtr>
+        (
+            messageItemPtr{ new MessageItem(
+                "Lisa"
+                , "Hello"
+                , false
+                , {})
+            }
+        ),
+        QVariant::fromValue<messageItemPtr>
+        (
+            messageItemPtr{ new MessageItem(
+               "Anton"
+                , "Hello"
+                , false
+                , {})
+            }
+        ),
+        QVariant::fromValue<messageItemPtr>
+        (
+            messageItemPtr{ new MessageItem(
+               "Anton"
+                , "םדדם"
+                , true
+                , {})
+            }
+        )
+    };
+
+    Q_EMIT download_messages(listik);
+
+    ui->stackedWidget->setCurrentIndex(4);
+};
+
 void ChatClient::onAddChatButtonClicked()
 {
 
@@ -135,6 +215,8 @@ void ChatClient::onProfileClicked()
 {
     //TODO ask from Server data about user (in client emit loggedIn)
 };
+
+//-----Chat Create Page
 
 void ChatClient::onCreateClicked()
 {
@@ -171,28 +253,7 @@ void ChatClient::onCancelClicked()
     ui->stackedWidget->setCurrentIndex(3);
 };
 
-void ChatClient::on_log_in_button_clicked() 
-{
-    if (!ui->login_nickname_edit->text().isEmpty() && !ui->login_password_edit->text().isEmpty()) {
-        client->login(ui->login_nickname_edit->text(), ui->login_password_edit->text());
-
-        //TODO delete. Just for time
-        loggedIn();
-    }
-    else
-        QMessageBox::information(this, "Warning", "Please input all fields");
-}
-
-void ChatClient::on_sign_in_button_clicked()
-{
-    ui->profile_edit_save_button->setText("Save");
-    ui->profile_start_chating_button->setEnabled(false);
-    QPixmap pixmap("./images/avatar.png");
-
-    // Set the pixmap to the QLabel
-    ui->profile_image_lable->setPixmap(pixmap);
-    ui->stackedWidget->setCurrentIndex(2);
-}
+//-----MessageList Page
 
 void ChatClient::on_sendButton_clicked()
 {
@@ -259,47 +320,14 @@ void ChatClient::on_image_clicked(const QString& image_path)
     ui.stackedWidget->setCurrentIndex(1);*/
 }
 
-void ChatClient::onChatClicked(qint32 chat_id_)
+void ChatClient::onLikeClicked(const QString& user_name, const QString& mess_id_, bool is_iked_)
 {
-    client->setRoomNum(chat_id_);
-    //TODO send to server new current room
+    //TODO send to client data of likes
+}
 
-    //TODO Delete
-    auto listik = QVariantList{
-        QVariant::fromValue<messageItemPtr>
-        (
-            messageItemPtr{ new MessageItem(
-                "Lisa"
-                , "Hello"
-                , false
-                , {})
-            }
-        ),
-        QVariant::fromValue<messageItemPtr>
-        (
-            messageItemPtr{ new MessageItem(
-               "Anton"
-                , "Hello"
-                , false
-                , {})
-            }
-        ),
-        QVariant::fromValue<messageItemPtr>
-        (
-            messageItemPtr{ new MessageItem(
-               "Anton"
-                , "םדדם"
-                , true
-                , {})
-            }
-        )
-    };
 
-    Q_EMIT download_messages(listik);
 
-    ui->stackedWidget->setCurrentIndex(4);
-};
-
+//TODO redefine
 void ChatClient::keyPressEvent(QKeyEvent* event_)
 {
     /*if (event_->key() == Qt::Key_Escape)
@@ -311,7 +339,10 @@ void ChatClient::keyPressEvent(QKeyEvent* event_)
 }
 
 
-//----Connect Server
+//-------------------------------SERVER-------------------------------
+//-----Start Page
+// 
+//Client initiate connection to server
 void ChatClient::attemptConnection()
 {
     if (client->socketInfo()->state() == QAbstractSocket::UnconnectedState)
@@ -330,7 +361,8 @@ void ChatClient::attemptConnection()
     }
 }
 
-//If client connected succesfuly, use this function
+//--Start Page -> Login Page 
+//If client connected succesfuly
 void ChatClient::connectedToServer()
 {
     PLOGI << "Client connected correctly";
@@ -340,6 +372,8 @@ void ChatClient::connectedToServer()
     ui->stackedWidget->setCurrentIndex(1);    
 }
 
+//-----LogIn Page
+//If client put wrong data or already exist on server, use this function
 void ChatClient::loginFailed(const QString& reason)
 {
     QMessageBox::critical(this, tr("Error"), reason);
@@ -348,6 +382,7 @@ void ChatClient::loginFailed(const QString& reason)
     ui->login_password_edit->clear();
 }
 
+//--LogIn Page -> Profile Page 
 //If client made a loging correctly, use this functuon
 void ChatClient::loggedIn()
 {
@@ -371,11 +406,100 @@ void ChatClient::loggedIn()
     ui->stackedWidget->setCurrentIndex(2);
 }
 
-//If the client was disconnected, use this function
-void ChatClient::disconnectedFromServer()
-{    
-    QMessageBox::warning(this, tr("Disconnected"), tr("The host terminated the connection"));
-    ui->stackedWidget->setCurrentIndex(0);
+//-----Profile Page
+//If client create a user correctly, use this function
+void ChatClient::userCreated(const UserItem& user_) {
+    config_data.setConfNickanme(user_.getUserNickname());
+    config_data.setConfPassword(user_.getUserPassword());
+
+    //TODO add about iqon
+    ui->profile_edit_save_button->setText("Edit");
+    ui->profile_nickname_edit->setEnabled(false);
+
+    PLOGI << "User" << user_.getUserNickname() << "created correctly";
+}
+
+//If client make a mistake, when create a user, use this function
+void ChatClient::createUserFailed(const QString& reason) {
+    QMessageBox::critical(this, tr("Error"), reason);
+
+    ui->profile_nickname_edit->clear();
+    ui->profile_nickname_edit->clear();
+
+    PLOGW << "Creating user finish with error" << reason;
+}
+
+//If client made changes with his profile, use this function
+void ChatClient::userEdited(const UserItem& user_) {
+    config_data.setConfNickanme(user_.getUserNickname());
+    config_data.setConfPassword(user_.getUserPassword());
+
+    //TODO add about iqon
+    ui->profile_edit_save_button->setText("Edit");
+    ui->profile_nickname_edit->setEnabled(false);
+
+    PLOGI << "User" << user_.getUserNickname() << "changed correctly";
+}
+
+//-----ChatList Page
+// 
+//--ChatList Page -> Chat Create Page 
+//If topics comes, use this function
+void ChatClient::topicsComes(const QStringList& topics_) 
+{
+    for (const QString& topic : topics_) {
+        ui->add_room_combo_box->addItem(topic);
+    }
+    ui->stackedWidget->setCurrentIndex(5);
+}
+
+//-----Chat Create Page
+// 
+//--Chat Create Page -> ChatList Page 
+//If chat created correctly, use this function
+void ChatClient::roomCreated(const ChatItem& chat_) 
+{
+    //TODO delete
+    Q_EMIT new_chat(
+        QVariant::fromValue<chatItemPtr>
+        (
+            chatItemPtr{ new ChatItem(
+                  chat_.getChatId()
+                , chat_.getChatRoomName()
+                , chat_.getChatRoomDescription()
+                , chat_.getChatRoomTopicName()
+                , chat_.getChatRoomIsPrivate()
+                , chat_.getChatRoomPassword()
+                , chat_.getChatRoomIsDeleted()) }
+        )
+    );
+}
+
+void ChatClient::connectedToRoom(const QList<MessageItem>& list_of_mess) 
+{
+ //TODO ask client for sending n-messages   
+}
+
+//If new mess recieved (download list of messages)
+void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
+{
+    QVariantList var_list;
+    for (const MessageItem& mes_item : list_of_mess) {
+        var_list.append(
+            QVariant::fromValue<messageItemPtr>
+            (
+                messageItemPtr{ new MessageItem(
+                    mes_item.getMesNickname()
+                    , mes_item.getMesText()
+                    , mes_item.isRtl()
+                    , mes_item.getMesFilelist()
+                    , mes_item.getMesAvatar()
+                ) }
+            )
+        );
+    }
+    
+    Q_EMIT download_messages(var_list);
 }
 
 //If new mess recieved
@@ -395,37 +519,22 @@ void ChatClient::messageReceived(const MessageItem& msg_)
     );
 }
 
-//If room created
-void ChatClient::roomCreated(const ChatItem& chat_) 
+//If new likes/dislikes recieved
+void ChatClient::likesReceived(const QString& user_name, const QString& mess_id_, bool is_iked_)
 {
-    //TODO delete
-    Q_EMIT new_chat(
-        QVariant::fromValue<chatItemPtr>
-        (
-            chatItemPtr{ new ChatItem(
-                  chat_.getChatId()
-                , chat_.getChatRoomName()
-                , chat_.getChatRoomDescription()
-                , chat_.getChatRoomTopicName()
-                , chat_.getChatRoomIsPrivate()
-                , chat_.getChatRoomPassword()
-                , chat_.getChatRoomIsDeleted()) }
-        )
-    );
+
 }
 
-void ChatClient::topicsComes(const QStringList& topics_) 
+
+
+//-----Others
+//If the client was disconnected, use this function
+void ChatClient::disconnectedFromServer()
 {
-    for (const QString& topic : topics_) {
-        ui->add_room_combo_box->addItem(topic);
-    }
-    ui->stackedWidget->setCurrentIndex(5);
+    QMessageBox::warning(this, tr("Disconnected"), tr("The host terminated the connection"));
+    ui->stackedWidget->setCurrentIndex(0);
 }
 
-void ChatClient::connectedToRoom(const QList<MessageItem>& list_of_mess) 
-{
-    
-}
 
 
 //TODO if Server don't work - i need reaction

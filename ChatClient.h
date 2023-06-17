@@ -63,6 +63,7 @@ private Q_SLOTS:
 
     //-----ProfileW
     void on_start_chatting_clicked();
+    void onSaveEditClicked();
 
     //-----ChatListW-----
     void onAddChatButtonClicked();
@@ -73,6 +74,8 @@ private Q_SLOTS:
     void on_attach_files();
     void on_image_clicked(const QString& image_path);
     void onChatClicked(qint32 chat_id_);
+    void onLikeClicked(const QString& user_name, const QString& mess_id_, bool is_iked_);
+
 
     //-----AddRoom-----
     void onCreateClicked();
@@ -83,10 +86,17 @@ private slots:
     void connectedToServer();
     void loginFailed(const QString& reason);
     void loggedIn();
+    void userCreated(const UserItem& user_);
+    void userEdited(const UserItem& user_);
+    void createUserFailed(const QString& reason);
+
     void messageReceived(const MessageItem& msg_);
+    void messageListReceived(const QList<MessageItem>& list_of_mess);
     void roomCreated(const ChatItem& chat_);
     void topicsComes(const QStringList& topics_);
     void connectedToRoom(const QList<MessageItem>& list_of_mess);
+
+    void likesReceived(const QString& user_name, const QString& mess_id_, bool is_iked_);
 
     void disconnectedFromServer();
 
