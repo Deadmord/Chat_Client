@@ -6,7 +6,7 @@
     "ServerPort": 5555,
     "User": {
         "LastRoomNumber": 5,
-        "Nickname": "User111",
-        "Password": "Anton"
+        "Nickname": "User01",
+        "Password": "Pass013"
     }
 }

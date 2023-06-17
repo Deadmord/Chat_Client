@@ -258,13 +258,13 @@ void ChatClient::connectedToServer()
         return client->disconnectFromHost();
     }
     // try to login with the given username
-    attemptLogin(newUsername);
+    attemptLogin(newUsername, client->getUserPassword());
 }
 
-void ChatClient::attemptLogin(const QString& userName)
+void ChatClient::attemptLogin(const QString& userName, const QString& password)
 {
     // use the client to attempt a log in with the given username
-    client->login(userName);
+    client->login(userName, password);
 }
 
 void ChatClient::loggedIn()

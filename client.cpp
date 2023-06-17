@@ -37,7 +37,7 @@ void Client::initSocket()
     connect(client_socket, &QTcpSocket::disconnected, this, [this]()->void {logged_in = false; });
 }
 
-void Client::login(const QString& userName)
+void Client::login(const QString& userName, const QString& password)
 {
     if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
         QByteArray buffer;
@@ -50,6 +50,7 @@ void Client::login(const QString& userName)
         QJsonObject message;
         message[QStringLiteral("type")] = QStringLiteral("login");
         message[QStringLiteral("username")] = userName;
+        message[QStringLiteral("password")] = password;
         // send the JSON using QDataStream
         const QByteArray jsonData = QJsonDocument(message).toJson(QJsonDocument::Compact);
         clientStream << quint16(0) << jsonData;
