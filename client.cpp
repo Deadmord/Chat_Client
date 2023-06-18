@@ -164,6 +164,18 @@ void Client::jsonReceived(const QJsonObject& docObj)
 
     }
 
+    if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0)
+    {
+        const QJsonObject messagebody_val = docObj.value(QLatin1String("messagebody")).toObject();
+        if (messagebody_val.isEmpty())
+            return;
+
+        DTOMessage msg_;
+        if (!DTOMessage::toDTOMessageFromJson(msg_, messagebody_val))
+            return;
+        emit messageReceived(msg_);
+        return;
+    }
     else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message
         // we extract the text field containing the chat text
         const QJsonValue textId = docObj.value(QLatin1String("id"));
