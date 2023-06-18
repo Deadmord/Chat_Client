@@ -119,7 +119,7 @@ void Client::jsonReceived(const QJsonObject& docObj)
                 const QJsonValue userRating = user_info_json.value(QLatin1String("rating"));
 
                 user_nickname = usernameVal.toString();
-                // userPic куда base 64 отправлять?
+                user_pic = userPic.toString();
                 user_rating = userRating.toInt();
                 emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()});
             }

@@ -72,6 +72,7 @@ private:
     QString         user_password;
     quint16         user_cur_room_number = 0;
     QString         user_avatar_path = "./images/avatar.png";
+    QString         user_pic;
     int             user_rating = 0;
     bool            logged_in;
     quint16         nextBlockSize = 0;  //the variable for keep size of reciving data
