@@ -101,7 +101,7 @@ void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_, const QByt
     //sendJson(message);
 
     //TODO change
-    QString type = "wMedia";
+    QString type = "Json";
     if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
         QByteArray buffer;
         buffer.clear();
@@ -110,8 +110,13 @@ void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_, const QByt
         // set the version so that programs compiled with different versions of Qt can agree on how to serialise
         clientStream.setVersion(QDataStream::Qt_6_5);
         // reserv size part in stream and send the JSON using QDataStream
-        const QByteArray jsonData = QJsonDocument(message).toJson();
-        clientStream << quint16(0) << type << jsonData << data_;
+    	const QByteArray jsonData = QJsonDocument(message).toJson();
+        //clientStream.setByteOrder(QDataStream::LittleEndian);
+        auto ass = type.toUtf8();
+        clientStream.writeBytes(ass, ass.size());
+        clientStream.writeBytes( jsonData, jsonData.size());
+      /*  clientStream << static_cast<quint16>(jsonData.size()) << jsonData;
+    	clientStream<< static_cast<quint16>(data_.size())<< data_;*/
         clientStream.device()->seek(0); //go to beginning data storage
         clientStream << quint16(buffer.size() - sizeof(quint16));
         client_socket->write(buffer);

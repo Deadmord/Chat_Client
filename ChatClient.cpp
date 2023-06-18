@@ -278,7 +278,7 @@ void ChatClient::on_sendButton_clicked()
     buffer.open(QIODevice::WriteOnly);
     QPixmap pixmap(ui->add_attach_button->property("attached").toString());
     // Save the pixmap as a PNG image
-    pixmap.save(&buffer, "PNG");
+    pixmap.save(&buffer, "JPEG");
 
 
     //QPixmap pixmap("./images/avatar.png");
