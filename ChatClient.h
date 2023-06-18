@@ -92,7 +92,7 @@ private slots:
     void userEdited(const UserItem& user_);
     void createUserFailed(const QString& reason);
 
-    void messageReceived(const MessageItem& msg_);
+    void messageReceived(const DTOMessage& msg_);
     void messageListReceived(const QList<MessageItem>& list_of_mess);
     void roomCreated(const ChatItem& chat_);
     void topicsComes(const QStringList& topics_);

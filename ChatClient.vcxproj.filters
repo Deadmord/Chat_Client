@@ -67,6 +67,12 @@
     <ClCompile Include="ChatWDelegate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DTOMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DTOUser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="entities.h">
@@ -76,6 +82,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ConfigService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DTOMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DTOUser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
