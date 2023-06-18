@@ -268,20 +268,31 @@ void ChatClient::on_sendButton_clicked()
     if (!ui->send_button->isEnabled())
         return;
 
-    static auto ID = 0ULL;
-    ++ID;
     auto id = QUuid::createUuid();
+
+    ui->add_attach_button->property("attached");
+
+
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    buffer.open(QIODevice::WriteOnly);
+    QPixmap pixmap(ui->add_attach_button->property("attached").toString());
+    // Save the pixmap as a PNG image
+    pixmap.save(&buffer, "PNG");
+
+
+    //QPixmap pixmap("./images/avatar.png");
     
     QString nickname = "Anton";
     auto text = ui->text_edit->toPlainText();
     bool is_RTL = IsCurrentInputLanguageRTL();
     listLikes listlikes;
     QString message_image_id;
-    QPixmap pixmap("./images/avatar.png");
+    //QPixmap pixmap("./images/avatar.png");
     QIcon icon(pixmap);
     //TODO send to server full data 
     QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(id.toString(), nickname, text, is_RTL, listlikes, message_image_id);
-    client->sendMessage(dto_message);
+    client->sendMessage(dto_message, byteArray);
     //messageItem -> dto
 
     ui->add_attach_button->setText(QString("Attach files"));

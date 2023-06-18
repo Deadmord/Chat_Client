@@ -79,15 +79,43 @@ void Client::entryRoom(quint16 room_number_)
         sendJson(message);
 }
 
-void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
+void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_, const QByteArray& data_)
 {
+
     if (shp_dto_message_->getMessageText().isEmpty())
         return; // We don't send empty messages
     // Create the JSON we want to send
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("text")] = shp_dto_message_->getMessageText();     //Заменить на объект
-    sendJson(message);
+    message[QStringLiteral("id")] = shp_dto_message_->getMessageId();
+    message[QStringLiteral("parentid")] = "";
+    message[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
+    message[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
+    message[QStringLiteral("text")] = shp_dto_message_->getMessageText();
+    message[QStringLiteral("mediaid")] = "";
+    message[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
+    message[QStringLiteral("likes")] = QJsonObject();
+
+
+
+    //sendJson(message);
+
+    //TODO change
+    QString type = "wMedia";
+    if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
+        QByteArray buffer;
+        buffer.clear();
+        // create a QDataStream for buffer operating 
+        QDataStream clientStream(&buffer, QIODevice::WriteOnly);
+        // set the version so that programs compiled with different versions of Qt can agree on how to serialise
+        clientStream.setVersion(QDataStream::Qt_6_5);
+        // reserv size part in stream and send the JSON using QDataStream
+        const QByteArray jsonData = QJsonDocument(message).toJson();
+        clientStream << quint16(0) << type << jsonData << data_;
+        clientStream.device()->seek(0); //go to beginning data storage
+        clientStream << quint16(buffer.size() - sizeof(quint16));
+        client_socket->write(buffer);
+    }
 }
 
 void Client::jsonReceived(const QJsonObject& docObj)

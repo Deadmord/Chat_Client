@@ -15,6 +15,7 @@
 #include <QJsonParseError>
 #include <QFile>
 #include <QList>
+#include <QBuffer>
 
 #include "entities.h"
 #include "client.h"

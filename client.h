@@ -55,7 +55,7 @@ public slots:
     void login(const QString& userNickname_, const QString& userPassword_);
     void roomListRequest();
     void entryRoom(quint16 room_number_);
-    void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_);
+    void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_, const QByteArray& data_ = QByteArray());
     void disconnectFromHost();
 private slots:
     void onReadyRead();
