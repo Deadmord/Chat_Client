@@ -19,7 +19,7 @@ public:
 	UserItem() : QObject(Q_NULLPTR) {};
 	UserItem(
 		QString		user_nickname_,
-		int			user_rating_ = 0,
+		qint32			user_rating_ = 0,
 		QByteArray	user_data_ = {},
 		QString user_password_ = "") :
 		QObject(nullptr),
@@ -106,7 +106,7 @@ private:
 	QString			user_password;
 
 	QIcon			user_avatar{};
-	int				user_rating{ 0 };
+	qint32				user_rating{ 0 };
 };
 
 using UserItemPtr = QSharedPointer<UserItem>;

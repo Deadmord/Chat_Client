@@ -15,6 +15,7 @@
 #include "MessageItem.h"
 #include "UserItem.h"
 #include "DTOMessage.h"
+#include "DTOUser.h"
 
 class Client : public QObject        //singleton
 {
@@ -43,7 +44,7 @@ public:
 signals:
     void connected();
     void disconnected();
-    void loggedIn(const UserItem& user_);
+    void loggedIn(const DTOUser& dto_user_);
     void loginError(const QString& reason);
     void messageReceived(const DTOMessage& msg_);
     void errorSignal(QAbstractSocket::SocketError socket_error);
