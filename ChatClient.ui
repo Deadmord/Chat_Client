@@ -18,7 +18,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>5</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="StartW">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -162,7 +162,7 @@
        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,3">
         <item>
          <widget class="QWidget" name="widget_7" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="4,1,5,0">
+          <layout class="QVBoxLayout" name="verticalLayout_4" stretch="4,0,1,5,0">
            <item>
             <widget class="QLabel" name="profile_image_lable">
              <property name="text">
@@ -171,6 +171,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QPushButton" name="profile_change_avatar_button">
+             <property name="text">
+              <string>Change Avatar</string>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter">
             <widget class="QLabel" name="profile_raiting_text">
              <property name="text">
               <string>rating_lable</string>
@@ -208,7 +215,7 @@
         </item>
         <item>
          <widget class="QWidget" name="widget" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,3,3,7,0">
+          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,3,3,0,7,0">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -257,6 +264,19 @@
              </layout>
             </widget>
            </item>
+           <item alignment="Qt::AlignRight">
+            <widget class="QPushButton" name="profile_change_password_button">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>ChangePassword</string>
+             </property>
+            </widget>
+           </item>
            <item>
             <spacer name="verticalSpacer_data_bottom">
              <property name="orientation">
@@ -271,15 +291,21 @@
             </spacer>
            </item>
            <item alignment="Qt::AlignRight">
-            <widget class="QPushButton" name="profile_edit_save_button">
+            <widget class="QPushButton" name="profile_save_button">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="maximumSize">
               <size>
-               <width>50</width>
+               <width>100</width>
                <height>16777215</height>
               </size>
              </property>
              <property name="text">
-              <string>Edit</string>
+              <string>Save</string>
              </property>
             </widget>
            </item>

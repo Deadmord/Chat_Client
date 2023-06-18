@@ -98,6 +98,50 @@ void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
     sendJson(message);
 }
 
+void Client::createUser(QSharedPointer<DTOUser> shp_dto_user_)
+{
+    //status:
+    //x create
+    //x update
+
+    if (shp_dto_user_->getNickname().isEmpty())
+        return; 
+
+    QJsonObject user;
+    user[QStringLiteral("type")] = QStringLiteral("signin");
+    user[QStringLiteral("username")] = shp_dto_user_->getNickname();
+    user[QStringLiteral("password")] = shp_dto_user_->getPassword();
+    user[QStringLiteral("userpic")] = shp_dto_user_->getUserpic();
+
+    sendJson(user);
+}
+
+void Client::updateUserPic(QSharedPointer<DTOUser> shp_dto_user_)
+{
+    if (shp_dto_user_->getUserpic().isEmpty())
+        return;
+
+    QJsonObject user;
+    user[QStringLiteral("type")] = QStringLiteral("changeUserPic");
+    user[QStringLiteral("username")] = shp_dto_user_->getNickname();
+    user[QStringLiteral("userpic")] = shp_dto_user_->getUserpic();
+
+    sendJson(user);
+}
+
+void Client::updateUserPassword(QSharedPointer<DTOUser> shp_dto_user_)
+{
+    if (shp_dto_user_->getPassword().isEmpty())
+        return;
+
+    QJsonObject user;
+    user[QStringLiteral("type")] = QStringLiteral("changeUserPic");
+    user[QStringLiteral("username")] = shp_dto_user_->getNickname();
+    user[QStringLiteral("password")] = shp_dto_user_->getPassword();
+
+    sendJson(user);
+}
+
 void Client::jsonReceived(const QJsonObject& docObj)
 {
     // actions depend on the type of message
