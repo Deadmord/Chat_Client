@@ -95,6 +95,7 @@
     <ClCompile Include="ChatWView.cpp" />
     <QtMoc Include="LikeItem.h" />
     <ClCompile Include="DTOMessage.cpp" />
+    <ClCompile Include="DTOUser.cpp" />
     <ClCompile Include="MessageWDelegate.cpp" />
     <ClCompile Include="MessageWModel.cpp" />
     <ClCompile Include="MessageWView.cpp" />
@@ -117,6 +118,7 @@
     <QtMoc Include="ChatWView.h" />
     <QtMoc Include="ChatWDelegate.h" />
     <ClInclude Include="DTOMessage.h" />
+    <ClInclude Include="DTOUser.h" />
     <ClInclude Include="entities.h" />
     <QtMoc Include="MessageItem.h" />
     <QtMoc Include="MessageWView.h" />
