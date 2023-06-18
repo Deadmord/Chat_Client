@@ -121,7 +121,8 @@ void Client::jsonReceived(const QJsonObject& docObj)
                 user_nickname = usernameVal.toString();
                 // userPic куда base 64 отправлять?
                 user_rating = userRating.toInt();
-                emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()});
+                //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
+                emit loggedIn(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
             }
             return;
         }

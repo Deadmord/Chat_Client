@@ -149,9 +149,27 @@ void ChatClient::on_start_chatting_clicked() {
 void ChatClient::onSaveEditClicked() {
     if (ui->profile_edit_save_button->text() == "Save") {
         //TODO send to client changed info
+        QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
+            ui->profile_nickname_edit->text(),
+            ui->profile_raiting_text->text().toInt(),
+            "",
+            ui->profile_password_edit->text()
+        );
+        
+        //->dto
+        //client->
     }
     else {
         //TODO send to client info about new user
+        //->dto
+        QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
+            ui->profile_nickname_edit->text(),
+            ui->profile_raiting_text->text().toInt(),
+            "",
+            ui->profile_password_edit->text()
+        );
+
+        //client->
     }
 }
 
@@ -382,29 +400,32 @@ void ChatClient::loginFailed(const QString& reason)
 
 //--LogIn Page -> Profile Page 
 //If client made a loging correctly, use this functuon
-void ChatClient::loggedIn(const UserItem& user_info_)
+void ChatClient::loggedIn(const DTOUser& dto_user_)
 {
     config_data.saveConfig(ui->login_nickname_edit->text(), ui->login_password_edit->text());
-
-
 
     ui->profile_edit_save_button->setText("Edit");
     ui->profile_start_chating_button->setEnabled(true);
 
     //Now they empty, becouse from server nothing was comming
-    ui->profile_nickname_edit->setText(client->getUserNickname());
-    ui->profile_password_edit->setText(client->getUserPassword());
+    ui->profile_nickname_edit->setText(dto_user_.getNickname());
 
     //TODO save config, when in client will bw all info
 
     ui->profile_nickname_edit->setEnabled(false);
     
-    QPixmap pixmap(client->getUserAvatarPath());
-    QPixmap scaledPixmap = pixmap.scaled(QSize(200, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
+    QPixmap pixmap1(client->getUserAvatarPath());
+    QPixmap scaledPixmap = pixmap1.scaled(QSize(200, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QString path{ ":/ChatClient/images/avatar.png" };
     // Set the pixmap to the QLabel
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    buffer.open(QIODevice::WriteOnly);
+    QPixmap pixmap(path);
+    // Save the pixmap as a PNG image
+    pixmap.save(&buffer, "PNG");
     ui->profile_image_lable->setPixmap(scaledPixmap);
-    ui->profile_raiting_text->setText(QString::number(client->getUserRating()));
+    ui->profile_raiting_text->setText(QString::number(dto_user_.getRating()));
     ui->stackedWidget->setCurrentIndex(2);
 }
 
