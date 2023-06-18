@@ -270,15 +270,19 @@ void ChatClient::on_sendButton_clicked()
 
     static auto ID = 0ULL;
     ++ID;
-
-    const auto nickname = "Anton";
-    const auto text = ui->text_edit->toPlainText();
-    auto const is_RTL = IsCurrentInputLanguageRTL();
-
+    auto id = QUuid::createUuid();
+    
+    QString nickname = "Anton";
+    auto text = ui->text_edit->toPlainText();
+    bool is_RTL = IsCurrentInputLanguageRTL();
+    listLikes listlikes;
+    QString message_image_id;
     QPixmap pixmap("./images/avatar.png");
     QIcon icon(pixmap);
-
-    //TODO send to server full data
+    //TODO send to server full data 
+    QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(id.toString(), nickname, text, is_RTL, listlikes, message_image_id);
+    client->sendMessage(dto_message);
+    //messageItem -> dto
 
     ui->add_attach_button->setText(QString("Attach files"));
     ui->add_attach_button->setProperty("attached", {});
@@ -498,21 +502,12 @@ void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
 }
 
 //If new mess recieved
-void ChatClient::messageReceived(const MessageItem& msg_)
+void ChatClient::messageReceived(const DTOMessage& msg_)
 {
 
     Q_EMIT new_message(
         QVariant::fromValue<messageItemPtr>
-        (
-            messageItemPtr{ new MessageItem(
-                msg_.getMesId()
-                , msg_.getMesNickname()
-                , msg_.getMesText()
-                , msg_.isRtl() //TODO how to understand] for new messages. Seems it should be inside JSON on server
-                , msg_.getMesListLikes()
-                , msg_.getMesMediaId() //TODO change. Here wil just ID of the picture. Need to convert ATTACH
-                , msg_.getMesAvatar()) } 
-        )
+        ( messageItemPtr{ DTOMessage::createMessageItemFromDTO(msg_) } )
     );
 }
 

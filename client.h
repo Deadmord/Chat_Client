@@ -13,6 +13,7 @@
 #include <QJsonParseError>
 
 #include "MessageItem.h"
+#include "DTOMessage.h"
 
 class Client : public QObject        //singleton
 {
@@ -43,7 +44,7 @@ signals:
     void disconnected();
     void loggedIn();
     void loginError(const QString& reason);
-    void messageReceived(const MessageItem& msg_);
+    void messageReceived(const DTOMessage& msg_);
     void errorSignal(QAbstractSocket::SocketError socket_error);
     void userJoined(const QString& username);
     void userLeft(const QString& username);
@@ -53,7 +54,7 @@ public slots:
     void login(const QString& userNickname_, const QString& userPassword_);
     void roomListRequest();
     void entryRoom(quint16 room_number_);
-    void sendMessage(const QString& text);
+    void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_);
     void disconnectFromHost();
 private slots:
     void onReadyRead();

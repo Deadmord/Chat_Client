@@ -79,14 +79,14 @@ void Client::entryRoom(quint16 room_number_)
         sendJson(message);
 }
 
-void Client::sendMessage(const QString& text)
+void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
 {
-    if (text.isEmpty())
+    if (shp_dto_message_->getMessageText().isEmpty())
         return; // We don't send empty messages
     // Create the JSON we want to send
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("text")] = text;     //Заменить на объект
+    message[QStringLiteral("text")] = shp_dto_message_->getMessageText();     //Заменить на объект
     sendJson(message);
 }
 
@@ -154,7 +154,9 @@ void Client::jsonReceived(const QJsonObject& docObj)
         const QJsonValue imageIdVal = docObj.value(QLatin1String("image"));
         // we extract the sender field containing the username of the sender
         // we notify a new message was received via the messageReceived signal
-        MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
+
+        //MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
+        DTOMessage msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
         emit messageReceived(msg_);
     }
 
