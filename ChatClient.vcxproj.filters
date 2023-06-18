@@ -75,6 +75,9 @@
     <ClInclude Include="Styles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -93,9 +96,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="UserItem.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="ConfigService.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="client.h">

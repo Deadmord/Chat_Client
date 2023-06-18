@@ -13,6 +13,7 @@
 #include <QJsonParseError>
 
 #include "MessageItem.h"
+#include "UserItem.h"
 
 class Client : public QObject        //singleton
 {
@@ -41,7 +42,7 @@ public:
 signals:
     void connected();
     void disconnected();
-    void loggedIn();
+    void loggedIn(const UserItem& user_);
     void loginError(const QString& reason);
     void messageReceived(const MessageItem& msg_);
     void errorSignal(QAbstractSocket::SocketError socket_error);

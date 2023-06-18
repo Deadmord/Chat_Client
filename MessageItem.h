@@ -40,7 +40,7 @@ public:
 		message_is_rtl(is_rtl_),
 		message_media_id(std::move(message_media_id_)),
 		message_list_likes(std::move(message_list_likes_)),
-		message_avatar(message_nickname_.isNull() ? getAvatarIcon(message_nickname_) : avatar_)
+		message_avatar(getAvatarIcon(message_nickname_))
 	{
 		message_is_own = (message_nickname == EXAMPLENAME);
 		!message_list_likes.isEmpty() ? message_likes = message_list_likes.size() : 0;
@@ -122,10 +122,6 @@ public:
 			like->getLikeUserName() == EXAMPLENAME ? true : false;
 		}
 	}
-
-
-
-	//[[nodiscard]] auto const& getImageCount() const { return message_image_count; }
 
 	[[nodiscard]] auto isRtl() const { return message_is_rtl; }
 
