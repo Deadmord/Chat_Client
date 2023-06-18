@@ -86,7 +86,15 @@ void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
     // Create the JSON we want to send
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("text")] = shp_dto_message_->getMessageText();     //Заменить на объект
+    message[QStringLiteral("id")] = shp_dto_message_->getMessageId();
+    message[QStringLiteral("parentid")] = "";
+    message[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
+    message[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
+    message[QStringLiteral("text")] = shp_dto_message_->getMessageText();
+    message[QStringLiteral("mediaid")] = "";
+    message[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
+    message[QStringLiteral("likes")] = QJsonObject();
+
     sendJson(message);
 }
 
@@ -121,7 +129,8 @@ void Client::jsonReceived(const QJsonObject& docObj)
                 user_nickname = usernameVal.toString();
                 // userPic куда base 64 отправлять?
                 user_rating = userRating.toInt();
-                emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()});
+                //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
+                emit loggedIn(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
             }
             return;
         }

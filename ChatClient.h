@@ -15,6 +15,7 @@
 #include <QJsonParseError>
 #include <QFile>
 #include <QList>
+#include <QBuffer>
 
 #include "entities.h"
 #include "client.h"
@@ -24,6 +25,7 @@
 
 #include "ChatItem.h"
 #include "ChatWView.h"
+#include "DTOUser.h"
 
 #include "ConfigService.h"
 
@@ -87,7 +89,7 @@ private slots:
     void attemptConnection();
     void connectedToServer();
     void loginFailed(const QString& reason);
-    void loggedIn(const UserItem& user_info_);
+    void loggedIn(const DTOUser& dto_user_);
     void userCreated(const UserItem& user_);
     void userEdited(const UserItem& user_);
     void createUserFailed(const QString& reason);
