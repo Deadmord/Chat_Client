@@ -25,6 +25,7 @@ public:
         QJsonObject     config_json;
         QJsonParseError jsonError;
 
+        config_file.setFileName(CONFIG_FILE_PATH);
         if (config_file.open(QIODevice::WriteOnly | QFile::Text))
         {
             QJsonObject json;
