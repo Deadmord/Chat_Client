@@ -16,17 +16,14 @@ public:
 		QString		room_name_,
 		QString		description_,
 		QString		chat_room_topic_name_,
-		bool		is_private_,
-		QString		password_ = "",
-		bool		is_deleted_ = false) :
+		bool		chat_room_is_private,
+		QString		chat_room_password_ = "") :
 		QObject(Q_NULLPTR),
 		chat_room_id(id_),
 		chat_room_name(std::move(room_name_)),
 		chat_room_description(std::move(description_)),
-		chat_room_topic_name(std::move(chat_room_topic_name_)),
-		chat_room_is_private(is_private_),
-		chat_room_password(std::move(password_)),
-		chat_room_is_deleted(is_deleted_)
+		chat_room_is_private(chat_room_is_private),
+		chat_room_topic_name(std::move(chat_room_topic_name_))
 	{};
 
 	~ChatItem() override = default;
@@ -54,9 +51,6 @@ public:
 	[[nodiscard]] auto getChatRoomPassword() const { return chat_room_password; };
 	void setChatRoomPassword(const QString& val_) { chat_room_password = val_; };
 
-	[[nodiscard]] auto getChatRoomIsDeleted() const { return chat_room_is_deleted; };
-	void setChatRoomIsDeleted(bool val_) { chat_room_is_deleted = val_; };
-
 	[[nodiscard]] auto isHovered() const { return chat_room_is_hovered; }
 	auto setIsHovered(const bool val) { chat_room_is_hovered = val; Q_EMIT hovered_changed(); }
 
@@ -75,11 +69,11 @@ private:
 	qint32		chat_room_id;
 	QString		chat_room_name;
 	QString		chat_room_description;
-	QString		chat_room_topic_name;
-	//Topic		chat_room_topic;
 	bool		chat_room_is_private;
 	QString		chat_room_password;
-	bool		chat_room_is_deleted;
+
+	QString		chat_room_topic_name;
+
 	bool		chat_room_is_hovered {false};
 
 	int			chat_current_row{ -1 };

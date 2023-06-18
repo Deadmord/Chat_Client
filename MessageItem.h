@@ -3,19 +3,14 @@
 #include <QDateTime>
 #include <QIcon>
 #include <ranges>
+#include <plog/Log.h> 
+#include <QResource>
 
 #include "Styles.h"
 #include "LikeItem.h"
 
 
-inline static QIcon getAvatarIcon(const int avatar_id)
-{
-	// TODO: implement getting images from custom storage
-	// here, just for test, we use default icon
 
-	static QIcon default_icon = QIcon(":/ChatClient/images/avatar.png");
-	return default_icon;
-}
 
 Q_DECLARE_METATYPE(QList<QPixmap>)
 
@@ -36,8 +31,8 @@ public:
 		QString			message_nickname_,
 		QString			message_text_,
 		const bool		is_rtl_,
+		listLikes		message_list_likes_, 
 		QString			message_media_id_ = "",
-		listLikes		message_list_likes_ = {},
 		const QIcon&	avatar_ = {}) : QObject(nullptr),
 		message_id(std::move(message_id_)),
 		message_nickname(std::move(message_nickname_)),
@@ -45,15 +40,9 @@ public:
 		message_is_rtl(is_rtl_),
 		message_media_id(std::move(message_media_id_)),
 		message_list_likes(std::move(message_list_likes_)),
-		message_avatar(avatar_.isNull() ? getAvatarIcon(0) : avatar_)
+		message_avatar(message_nickname_.isNull() ? getAvatarIcon(message_nickname_) : avatar_)
 	{
 		message_is_own = (message_nickname == EXAMPLENAME);
-		/*message_image_list.clear();
-		for (const auto& path : message_file_list)
-		{
-			message_image_list.push_back(QPixmap(path).scaled(IMAGE_PREVIEW_SIZE_MAX, Qt::KeepAspectRatio));
-		}
-		message_image_count = static_cast<int>(message_image_list.size());*/
 		!message_list_likes.isEmpty() ? message_likes = message_list_likes.size() : 0;
 	};
 
@@ -94,19 +83,6 @@ public:
 	[[nodiscard]] auto getMesMediaId() const { return message_media_id; }
 	auto setMesMediaId(const QString val) { message_media_id = val; }
 
-	/*[[nodiscard]] auto const& getMesFilelist() const { return message_file_list; }
-	auto setMesFilelist(const QStringList& val)
-	{
-		message_image_list.clear();
-		
-		std::ranges::transform(val, message_image_list.begin(), [](const auto& path) { return QPixmap(path).scaled(IMAGE_PREVIEW_SIZE_MAX, Qt::IgnoreAspectRatio); });
-		message_file_list = val;
-		message_image_count = static_cast<int>(message_image_list.size());
-	}
-
-	[[nodiscard]] auto const& getMesImagelist() const { return message_image_list; }
-	*/
-
 	[[nodiscard]] auto const& getMesAvatar() const { return message_avatar; }
 	auto setMesAvatar(const QIcon& val) { message_avatar = val; Q_EMIT  avatar_changed(); }
 
@@ -135,6 +111,7 @@ public:
 	[[nodiscard]] auto const& getDislikeButtRect() const { return message_dislike_butt_rect; }
 	auto setDislikeButtRect(const QRect val) { message_dislike_butt_rect = val; }
 
+	[[nodiscard]] auto getMesListLikes() const { return message_list_likes; };
 	auto addNewLike(const likeItemPtr val) { 
 		message_list_likes.emplaceBack(val);
 		message_likes = val->getLikeReaction() == Like_enum::LIKE ? message_likes++: message_likes--;
@@ -156,6 +133,33 @@ Q_SIGNALS:
 	void avatar_changed();
 	void likes_changed();
 	void hovered_changed();
+	void ask_avatar(const QString& nickname_);
+
+private:
+		QIcon getAvatarIcon(const QString& mes_nickname_)
+		{
+			static QIcon default_icon;
+			if (!mes_nickname_.isNull()) {
+				QString path = ":/ChatClient/images/" + mes_nickname_ + ".png";
+				QResource res_path(path);
+				if (res_path.isValid()) {
+					default_icon = QIcon(path);
+					PLOGI << "Avatar downloaded from .qrc";
+				}
+				else {
+					default_icon = QIcon(":/ChatClient/images/avatar.png");
+					PLOGI << "File doesn't exist. Send request for Avatar";
+					//todo create connect
+					Q_EMIT ask_avatar(mes_nickname_);
+				}
+			}
+			else {
+				default_icon = QIcon(":/ChatClient/images/avatar.png");
+				PLOGI << "Nickname is empty. Used standart avatar";
+			}
+
+			return default_icon;
+		}
 
 private:
 	bool			message_is_hovered{ false };
@@ -168,9 +172,6 @@ private:
 	QDateTime		message_time_stamp{ QDateTime::currentDateTime() };
 
 	QString			message_media_id{};
-	//QList<QPixmap>	message_image_list {};
-	//int				message_image_count{ 0 };
-	//QStringList		message_file_list;
 	bool			message_is_rtl{ false };
 
 	listLikes		message_list_likes;

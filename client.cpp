@@ -134,10 +134,10 @@ void Client::jsonReceived(const QJsonObject& docObj)
             return; // the text field was invalid so we ignore
         if (senderVal.isNull() || !senderVal.isString())
             return; // the sender field was invalid so we ignore
-        const QJsonValue imageIdVal = docObj.value(QLatin1String("text"));
+        const QJsonValue imageIdVal = docObj.value(QLatin1String("image"));
         // we extract the sender field containing the username of the sender
         // we notify a new message was received via the messageReceived signal
-        MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, imageIdVal.toString());
+        MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
         emit messageReceived(msg_);
     }
 

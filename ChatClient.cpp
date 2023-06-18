@@ -68,7 +68,7 @@ ChatClient::ChatClient(QWidget* parent)
     connect(ui->add_room_create_button, &QPushButton::clicked, this, &ChatClient::onCreateClicked);
 
 
-    //Connections with Client
+    //Connections with client
     connect(client, &Client::connected, this, &ChatClient::connectedToServer);
     connect(client, &Client::loginError, this, &ChatClient::loginFailed);
     connect(client, &Client::loggedIn, this, &ChatClient::loggedIn);
@@ -138,8 +138,7 @@ void ChatClient::on_start_chatting_clicked() {
                 , "Name_2"
                 , "Description_2"
                 , "Lable_2"
-                , true
-                , "Password")
+                , false)
             }
         )
     };
@@ -246,8 +245,7 @@ void ChatClient::onCreateClicked()
                 , ui->add_room_descr_edit->toPlainText()
                 , ui->add_room_combo_box->currentText()
                 , ui->add_room_private_check_box->isTristate()
-                , ui->add_room_password_edit->text()
-                , false) }
+                , ui->add_room_password_edit->text()) }
         )
     );
 
@@ -280,19 +278,6 @@ void ChatClient::on_sendButton_clicked()
     QIcon icon(pixmap);
 
     //TODO send to server full data
-
-    Q_EMIT new_message(
-        QVariant::fromValue<messageItemPtr>
-        (
-            messageItemPtr{ new MessageItem(
-                "id"
-                , nickname
-                , text
-                , is_RTL
-                , "llll"
-                ) }
-        )
-    );
 
     ui->add_attach_button->setText(QString("Attach files"));
     ui->add_attach_button->setProperty("attached", {});
@@ -477,8 +462,7 @@ void ChatClient::roomCreated(const ChatItem& chat_)
                 , chat_.getChatRoomDescription()
                 , chat_.getChatRoomTopicName()
                 , chat_.getChatRoomIsPrivate()
-                , chat_.getChatRoomPassword()
-                , chat_.getChatRoomIsDeleted()) }
+                , chat_.getChatRoomPassword()) }
         )
     );
 }
@@ -501,7 +485,9 @@ void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
                     , mes_item.getMesNickname()
                     , mes_item.getMesText()
                     , mes_item.isRtl()
+                    , mes_item.getMesListLikes()
                     , mes_item.getMesMediaId()
+                    , mes_item.getMesAvatar()
                 ) }
             )
         );
@@ -513,6 +499,7 @@ void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
 //If new mess recieved
 void ChatClient::messageReceived(const MessageItem& msg_)
 {
+
     Q_EMIT new_message(
         QVariant::fromValue<messageItemPtr>
         (
@@ -520,9 +507,10 @@ void ChatClient::messageReceived(const MessageItem& msg_)
                 msg_.getMesId()
                 , msg_.getMesNickname()
                 , msg_.getMesText()
-                , msg_.isRtl() //TODO how to understand for new messages. Seems it should be inside JSON on server
-                , msg_.getMesMediaId() )} //TODO change. Here wil just ID of the picture. Need to convert ATTACH
-                //, msg_.getMesAvatar()) }  //TODO change. Here wil just ID of the picture. Need to convert AVATAR
+                , msg_.isRtl() //TODO how to understand] for new messages. Seems it should be inside JSON on server
+                , msg_.getMesListLikes()
+                , msg_.getMesMediaId() //TODO change. Here wil just ID of the picture. Need to convert ATTACH
+                , msg_.getMesAvatar()) } 
         )
     );
 }
@@ -530,6 +518,7 @@ void ChatClient::messageReceived(const MessageItem& msg_)
 ////If new likes/dislikes recieved
 void ChatClient::likeReceivedServer(const Likes& like_)
 {
+
     Q_EMIT recivedLike(
         QVariant::fromValue<likeItemPtr>
         (
