@@ -85,17 +85,20 @@ void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
     if (shp_dto_message_->getMessageText().isEmpty())
         return; // We don't send empty messages
     // Create the JSON we want to send
+
+    QJsonObject messagebody;
+    messagebody[QStringLiteral("id")] = shp_dto_message_->getMessageId();
+    messagebody[QStringLiteral("parentid")] = "";
+    messagebody[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
+    messagebody[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
+    messagebody[QStringLiteral("text")] = shp_dto_message_->getMessageText();
+    messagebody[QStringLiteral("mediaid")] = "";
+    messagebody[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
+    messagebody[QStringLiteral("likes")] = QJsonObject();
+
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("id")] = shp_dto_message_->getMessageId();
-    message[QStringLiteral("parentid")] = "";
-    message[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
-    message[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
-    message[QStringLiteral("text")] = shp_dto_message_->getMessageText();
-    message[QStringLiteral("mediaid")] = "";
-    message[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
-    message[QStringLiteral("likes")] = QJsonObject();
-
+    message[QStringLiteral("messagebody")] = messagebody;
     sendJson(message);
 }
 
