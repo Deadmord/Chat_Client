@@ -98,7 +98,21 @@ void Client::jsonReceived(const QJsonObject& docObj)
         const bool loginSuccess = resultVal.toBool();
         if (loginSuccess) {
             // we logged in succesfully and we notify it via the loggedIn signal
-            //TODO here should recive a full data of the user. That client will use for showing
+            {
+                //TODO here should recive a full data of the user. That client will use for showing
+                const QJsonObject user_info_json = docObj.value(QLatin1String("userinfo")).toObject();
+                if (user_info_json.isEmpty())
+                    return; // the userinfo has to not empty so we ignore
+                const QJsonValue usernameVal = user_info_json.value(QLatin1String("username"));
+                if (usernameVal.isNull() || !usernameVal.isString())
+                    return; // the username was invalid so we ignore
+                const QJsonValue userPic = user_info_json.value(QLatin1String("userpic"));
+                const QJsonValue userRating = user_info_json.value(QLatin1String("rating"));
+
+                user_nickname = usernameVal.toString();
+                // userPic куда base 64 отправлять?
+                user_rating = userRating.toInt();
+            }
             emit loggedIn();
             return;
         }
