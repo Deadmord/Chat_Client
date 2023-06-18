@@ -319,9 +319,9 @@ void ChatClient::on_attach_files()
     }
 
 
-    if (file_names.size() > 3)
+    if (file_names.size() > 1)
     {
-        QMessageBox::warning(this, tr("Warning"), tr("You can attach up to 3 files!"));
+        QMessageBox::warning(this, tr("Warning"), tr("You can attach up to 1 files!"));
         return;
     }
 
@@ -402,7 +402,7 @@ void ChatClient::loginFailed(const QString& reason)
 //If client made a loging correctly, use this functuon
 void ChatClient::loggedIn(const DTOUser& dto_user_)
 {
-    config_data.saveConfig(ui->login_nickname_edit->text(), ui->login_password_edit->text());
+    config_data.getConfig().saveConfig(ui->login_nickname_edit->text(), ui->login_password_edit->text());
 
     ui->profile_edit_save_button->setText("Edit");
     ui->profile_start_chating_button->setEnabled(true);
