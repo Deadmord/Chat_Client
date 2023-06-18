@@ -97,7 +97,7 @@ void ChatClient::on_log_in_button_clicked()
         client->login(ui->login_nickname_edit->text(), ui->login_password_edit->text());
 
         //TODO delete. Just for time
-        loggedIn({ "Niko",3, {} });
+        //loggedIn({ "Niko",3, {} });
     }
     else
         QMessageBox::information(this, "Warning", "Please input all fields");
