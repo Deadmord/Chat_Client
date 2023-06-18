@@ -14,6 +14,7 @@
 
 #include "MessageItem.h"
 #include "UserItem.h"
+#include "ChatItem.h"
 #include "DTOMessage.h"
 #include "DTOUser.h"
 
@@ -47,6 +48,7 @@ signals:
     void loggedIn(const DTOUser& dto_user_);
     void loginError(const QString& reason);
     void messageReceived(const DTOMessage& msg_);
+    void chatListRecived(const chatList& roomItems);
     void errorSignal(QAbstractSocket::SocketError socket_error);
     void userJoined(const QString& username);
     void userLeft(const QString& username);
@@ -73,6 +75,7 @@ private:
     QString         user_password;
     quint16         user_cur_room_number = 0;
     QString         user_avatar_path = "./images/avatar.png";
+    QString         user_pic;
     int             user_rating = 0;
     bool            logged_in;
     quint16         nextBlockSize = 0;  //the variable for keep size of reciving data
