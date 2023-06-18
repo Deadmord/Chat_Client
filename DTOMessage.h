@@ -1,6 +1,8 @@
 #ifndef DTOMESSAGE_H
 #define DTOMESSAGE_H
-
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonParseError>
 #include <QString>
 #include <QSharedPointer>
 #include "LikeItem.h"
@@ -12,11 +14,12 @@ private:
 	QString message_id;
 	QString message_nickname;
 	QString message_text;
-	const bool is_rtl;
+	const bool is_rtl = false;
 	listLikes message_list_likes;
 	QString message_image_id;
 
 public:
+	DTOMessage();
 	DTOMessage(const QString& message_id_, const QString& message_nickname_, const QString& message_text_, const bool& is_rtl_, const listLikes& message_list_likes_, const QString& message_image_id_);
 
 	QString getMessageId() const;
@@ -33,6 +36,8 @@ public:
 
 	static QSharedPointer<MessageItem> createMessageItemFromDTO(const DTOMessage& dto_message);
 	static QSharedPointer<DTOMessage> createDTOMessageFromMessageItem(const MessageItem& message_item_);
+	static bool toDTOMessageFromJson(DTOMessage& user_masg_dto_, const QJsonObject& user_msg_);
+	static bool toJsonFromDTOMessage(QJsonObject& user_msg_, const DTOMessage& user_masg_dto_);
 };
 
 #endif // !DTOMESSAGE_H
