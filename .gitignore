@@ -482,3 +482,5 @@ FodyWeavers.xsd
 
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
+/x64/Debug/ChatClient.Build.CppClean.log
+/x64/Debug/ChatClient.log

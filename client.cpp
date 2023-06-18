@@ -44,56 +44,32 @@ void Client::connectToServer(const QHostAddress& address, quint16 port)
     emit connected();
 }
 
-//Nuta - Added fild "password"
+void Client::disconnectFromHost()
+{
+    client_socket->disconnectFromHost();
+    initSocket();
+}
+
 void Client::login(const QString& userNickname_, const QString& userPassword_)
 {
-    if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
-        QByteArray buffer;
-        buffer.clear();
-        // create a QDataStream for buffer operating 
-        QDataStream clientStream(&buffer, QIODevice::WriteOnly);
-        // set the version so that programs compiled with different versions of Qt can agree on how to serialise
-        clientStream.setVersion(QDataStream::Qt_6_5);
-        // Create the JSON we want to send
-        QJsonObject message;
-        message[QStringLiteral("type")] = QStringLiteral("login");
-        message[QStringLiteral("username")] = userNickname_;
-        message[QStringLiteral("password")] = userPassword_;
-        // send the JSON using QDataStream
-        const QByteArray jsonData = QJsonDocument(message).toJson(QJsonDocument::Compact);
-        clientStream << quint16(0) << jsonData;
-        clientStream.device()->seek(0); //go to beginning data storage
-        clientStream << quint16(buffer.size() - sizeof(quint16));
-        client_socket->write(buffer);
-    }
+    // Create the JSON we want to send
+    QJsonObject message;
+    message[QStringLiteral("type")] = QStringLiteral("login");
+    message[QStringLiteral("username")] = userNickname_;
+    message[QStringLiteral("password")] = userPassword_;
+    // send the JSON
+    sendJson(message);
 }
 
 void Client::sendMessage(const QString& text)
 {
     if (text.isEmpty())
         return; // We don't send empty messages
-    QByteArray buffer;
-    buffer.clear();
-    // create a QDataStream for buffer operating 
-    QDataStream clientStream(&buffer, QIODevice::WriteOnly);
-    // set the version so that programs compiled with different versions of Qt can agree on how to serialise
-    clientStream.setVersion(QDataStream::Qt_6_5);
     // Create the JSON we want to send
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("text")] = text;
-    // reserv size part in stream and send the JSON using QDataStream
-    const QByteArray jsonData = QJsonDocument(message).toJson();
-    clientStream << quint16(0) << jsonData;
-    clientStream.device()->seek(0); //go to beginning data storage
-    clientStream << quint16(buffer.size() - sizeof(quint16));
-    client_socket->write(buffer);
-}
-
-void Client::disconnectFromHost()
-{
-    client_socket->disconnectFromHost();
-    initSocket();
+    message[QStringLiteral("text")] = text;     //Заменить на объект
+    sendJson(message);
 }
 
 void Client::jsonReceived(const QJsonObject& docObj)
@@ -157,6 +133,24 @@ void Client::jsonReceived(const QJsonObject& docObj)
     }
 }
 
+void Client::sendJson(const QJsonObject& doc)
+{
+    if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
+        QByteArray buffer;
+        buffer.clear();
+        // create a QDataStream for buffer operating 
+        QDataStream clientStream(&buffer, QIODevice::WriteOnly);
+        // set the version so that programs compiled with different versions of Qt can agree on how to serialise
+        clientStream.setVersion(QDataStream::Qt_6_5);
+        // reserv size part in stream and send the JSON using QDataStream
+        const QByteArray jsonData = QJsonDocument(doc).toJson();
+        clientStream << quint16(0) << jsonData;
+        clientStream.device()->seek(0); //go to beginning data storage
+        clientStream << quint16(buffer.size() - sizeof(quint16));
+        client_socket->write(buffer);
+    }
+}
+
 void Client::onReadyRead()
 {
     // prepare a container to hold the UTF-8 encoded JSON we receive from the socket
@@ -207,14 +201,6 @@ void Client::onReadyRead()
         break;
     }
 }
-
-
-
-
-
-
-
-
 
 
 

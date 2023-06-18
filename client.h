@@ -59,6 +59,7 @@ private slots:
 private:
     void initSocket();
     void jsonReceived(const QJsonObject& doc);
+    void sendJson(const QJsonObject& doc);
 
 private:
     QTcpSocket*     client_socket;
