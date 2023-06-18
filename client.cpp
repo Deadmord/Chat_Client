@@ -1,4 +1,5 @@
 #include "client.h"
+#include "ChatItem.h"
 
 Client::Client(QObject* parent)
     : QObject(parent)
@@ -131,12 +132,24 @@ void Client::jsonReceived(const QJsonObject& docObj)
         emit loginError(reasonVal.toString());
     }
 
-    if (typeVal.toString().compare(QLatin1String("roomList"), Qt::CaseInsensitive) == 0) 
+    if (typeVal.toString().compare(QLatin1String("roomList"), Qt::CaseInsensitive) == 0)
     {
         const QJsonArray roomsVal = docObj.value(QLatin1String("rooms")).toArray();
         if (roomsVal.isEmpty());
             return; // rooms empty so we ignored
-        // тут разобрать JSON и записать в List комнат
+        chatList roomItems;
+        for(QJsonValue room: roomsVal)
+        {
+            const QJsonObject roomObj = room.toObject();
+            qint32 id = roomObj.value(QLatin1String("id")).toInt();
+            QString name = roomObj.value(QLatin1String("name")).toString();
+            QString description = roomObj.value(QLatin1String("description")).toString();
+            QString topic = roomObj.value(QLatin1String("topic")).toString();
+            bool is_private = roomObj.value(QLatin1String("is_private")).toBool();
+            roomItems.append(chatItemPtr( new ChatItem( id, name, description, topic, is_private)));
+        }
+        emit chatListRecived(roomItems);
+
     }
 
     else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message

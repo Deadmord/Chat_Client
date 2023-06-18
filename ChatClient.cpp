@@ -38,7 +38,7 @@ ChatClient::ChatClient(QWidget* parent)
 
 
     connect(this, &ChatClient::new_chat, ui->chatList_listView, &ChatWView::onChatAdded);
-    connect(this, &ChatClient::download_chat, ui->chatList_listView, &ChatWView::onChatsAdded);
+    connect(this, &ChatClient::download_chats, ui->chatList_listView, &ChatWView::onChatsAdded);
 
     connect(ui->chat_listView, &MessageWView::imageClicked, this, &ChatClient::on_image_clicked);
     connect(ui->chatList_listView, &ChatWView::chatClicked, this, &ChatClient::onChatClicked);
@@ -73,6 +73,7 @@ ChatClient::ChatClient(QWidget* parent)
     connect(client, &Client::loginError, this, &ChatClient::loginFailed);
     connect(client, &Client::loggedIn, this, &ChatClient::loggedIn);
     connect(client, &Client::messageReceived, this, &ChatClient::messageReceived);
+    connect(client, &Client::chatListRecived, this, &ChatClient::chatListRecived);
     //connect(client, &Client::roomCreated, this, &ChatClient::roomCreated); //TODO MAKE in client
 
     connect(client, &Client::disconnected, this, &ChatClient::disconnectedFromServer); //TODO make a buttton to disconnect
@@ -143,7 +144,7 @@ void ChatClient::on_start_chatting_clicked() {
         )
     };
 
-    Q_EMIT download_chat(listik);
+    Q_EMIT download_chats(listik);
 }
 
 void ChatClient::onSaveEditClicked() {
@@ -501,6 +502,20 @@ void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
     }
     
     Q_EMIT download_messages(var_list);
+}
+
+//If new mess recieved (download list of messages)
+void ChatClient::chatListRecived(const chatList& list_of_chats)
+{
+    QVariantList var_list;
+    for (const chatItemPtr& chat_item : list_of_chats) {
+        var_list.append(
+            QVariant::fromValue<chatItemPtr>
+            (chat_item)
+        );
+    }
+
+    Q_EMIT download_chats(var_list);
 }
 
 //If new mess recieved

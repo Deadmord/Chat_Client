@@ -49,7 +49,7 @@ public:
 Q_SIGNALS:
     void new_message(const QVariant& msg);
     void new_chat(const QVariant& chat_);
-    void download_chat(const QVariantList& list_chats_);
+    void download_chats(const QVariantList& list_chats_);
     void download_messages(const QVariantList& list_msg_);
     void recivedLike(const QVariant& like_);
 
@@ -95,6 +95,7 @@ private slots:
     void messageReceived(const DTOMessage& msg_);
     void messageListReceived(const QList<MessageItem>& list_of_mess);
     void roomCreated(const ChatItem& chat_);
+    void chatListRecived(const chatList& list_of_mess);
     void topicsComes(const QStringList& topics_);
     void connectedToRoom(const QList<MessageItem>& list_of_mess);
 
