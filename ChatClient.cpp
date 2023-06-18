@@ -160,7 +160,8 @@ void ChatClient::onSaveEditClicked() {
 
 void ChatClient::onChatClicked(qint32 chat_id_)
 {
-    client->setRoomNum(chat_id_);
+client->roomListRequest();
+    //client->setRoomNum(chat_id_);
     //TODO send to server new current room
 
     //TODO Delete
