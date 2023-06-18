@@ -121,8 +121,8 @@ void Client::jsonReceived(const QJsonObject& docObj)
                 user_nickname = usernameVal.toString();
                 // userPic куда base 64 отправлять?
                 user_rating = userRating.toInt();
+                emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()});
             }
-            emit loggedIn();
             return;
         }
         // the login attempt failed, we extract the reason of the failure from the JSON

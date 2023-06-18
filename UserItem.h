@@ -2,15 +2,10 @@
 
 #include <QDateTime>
 #include <QIcon>
+#include <plog/Log.h> 
+#include <QFile>
+#include <QResource>
 
-inline static QIcon getUserAvatarIcon(const int avatar_id)
-{
-	// TODO: implement getting images from custom storage
-	// here, just for test, we use default icon
-
-	static QIcon default_icon = QIcon(":/ChatClient/images/avatar.png");
-	return default_icon;
-}
 
 class UserItem : public QObject, public QEnableSharedFromThis<UserItem>
 {
@@ -21,11 +16,24 @@ public:
 		QString user_password;
 	};
 
-	static UserItem* instance()
-	{
-		static UserItem instance;
-		return &instance;
-	}
+	UserItem() : QObject(Q_NULLPTR) {};
+	UserItem(
+		QString		user_nickname_,
+		int			user_rating_ = 0,
+		QByteArray	user_data_ = {},
+		QString user_password_ = "") :
+		QObject(nullptr),
+		user_nickname(std::move(user_nickname_)),
+		user_password(std::move(user_password_)),
+		user_rating(user_rating_),
+		user_avatar(getUserAvatarIcon(user_nickname_, user_data_))
+	{};
+
+	~UserItem() override = default;
+	UserItem(const UserItem&) = delete;
+	UserItem(UserItem&&) = delete;
+	const UserItem& operator =(const UserItem&) = delete;
+	UserItem& operator = (UserItem&&) = delete;
 
 	auto shared() { return sharedFromThis(); }
 
@@ -50,25 +58,48 @@ Q_SIGNALS:
 	void avatar_changed();
 	void rating_changed();
 
+	
 private:
-	explicit UserItem() : QObject(Q_NULLPTR) {};
-	explicit UserItem(
-		QString user_nickname_,
-		QString user_password_,
-		int		user_rating_ = 0,
-		const QIcon&	user_avatar_ = {}) : 
-			QObject(nullptr),
-			user_nickname(std::move(user_nickname_)),
-			user_password(std::move(user_password_)),
-			user_rating(user_rating_),
-			user_avatar(user_avatar_.isNull() ? getUserAvatarIcon(0) : user_avatar_)
-	{};
 
-	~UserItem() override = default;
-	UserItem(const UserItem&) = delete;
-	UserItem(UserItem&&) = delete;
-	const UserItem& operator =(const UserItem&) = delete;
-	UserItem& operator = (UserItem&&) = delete;
+	QIcon getUserAvatarIcon(const QString& user_nickname_, const QByteArray& user_avatar_data_)
+	{
+		QIcon default_icon;
+		if (!user_nickname_.isNull()) {
+			QString path = ":/ChatClient/images/" + user_nickname_ + ".png";
+			QResource res_path(path);
+			QFile file(path);
+			if (res_path.isValid()) {
+				default_icon = QIcon(path);
+				PLOGI << "Avatar "<< user_nickname <<" exist in.qrc";
+			}
+			else {
+				if (file.open(QIODevice::WriteOnly))
+				{
+					if (!user_avatar_data_.isEmpty()) {
+						file.write(user_avatar_data_);
+						file.close();
+						default_icon = QIcon(path);
+						PLOGI << "Image Create successfully.";
+					}
+					else {
+						default_icon = QIcon(":/ChatClient/images/avatar.png");
+						PLOGW << "No data in QByte array. used standart avatar";
+					}
+				}
+				else
+				{
+					default_icon = QIcon(":/ChatClient/images/avatar.png");
+					PLOGW << "Failed to save image. used standart avatar";
+				}
+			}
+		}
+		else {
+			default_icon = QIcon(":/ChatClient/images/avatar.png");
+			PLOGW << "No data comes from server. Used standart avatar";
+		}
+
+		return default_icon;
+	}
 
 private:
 	QString			user_nickname;

@@ -12,12 +12,50 @@
 
 
 
-class ConfigData : QObject
-{
-    Q_OBJECT;
+class ConfigData{
 
 public:
-    explicit ConfigData() : QObject(Q_NULLPTR)
+    static ConfigData getConfig() {
+        ConfigData config;
+        return config;
+    }
+
+    void saveConfig(const QString& nickname_, const QString& password_) {
+        QFile           config_file;
+        QJsonObject     config_json;
+        QJsonParseError jsonError;
+
+        if (config_file.open(QIODevice::WriteOnly | QFile::Text))
+        {
+            QJsonObject json;
+            QJsonObject user;
+
+            json["ServerAddress"] = config_server_adress;
+            json["ServerPort"] = config_server_port;
+            user["Nickname"] = nickname_;
+            user["Password"] = password_;
+            json["User"] = user;
+            config_json = json;
+            config_file.write(QJsonDocument(config_json).toJson());
+        }
+        else
+        {
+            qDebug() << "Error configuration file cannot be opened.";
+        }
+        config_file.close();
+    };
+
+
+    auto getConfNickname() const { return config_user_nickname; };
+    auto setConfNickanme(const QString& var_) { config_user_nickname = var_; };
+    auto getConfPassword() const { return config_user_password; };
+    auto setConfPassword(const QString& var_) { config_user_password = var_; };
+
+    auto getConfPort() { return config_server_port; };
+    auto getConfServer() { return config_server_adress;  };
+
+private:
+    explicit ConfigData()
     {
         QFile           config_file;
         QJsonParseError jsonError;
@@ -60,13 +98,6 @@ public:
     };
 
 
-    auto getConfNickname() { return config_user_nickname; };
-    auto setConfNickanme(const QString& var_) { config_user_nickname = var_; };
-    auto getConfPassword() { return config_user_password; };
-    auto setConfPassword(const QString& var_) { config_user_password = var_; };
-
-    auto getConfPort() { return config_server_port; };
-    auto getConfServer() { return config_server_adress;  };
 
 private:
 
@@ -79,32 +110,6 @@ private:
     QString			config_user_password;
 
     void loadConfig() {}
-
-
-    void saveConfig(const QString& nickname_, const QString& password_) {
-        QFile           config_file;
-        QJsonObject     config_json;
-        QJsonParseError jsonError;
-
-        if (config_file.open(QIODevice::WriteOnly | QFile::Text))
-        {
-            QJsonObject json;
-            QJsonObject user;
-
-            json["ServerAddress"] = config_server_adress;
-            json["ServerPort"] = config_server_port;
-            user["Nickname"] = nickname_;
-            user["Password"] = password_;
-            json["User"] = user;
-            config_json = json;
-            config_file.write(QJsonDocument(config_json).toJson());
-        }
-        else
-        {
-            qDebug() << "Error configuration file cannot be opened.";
-        }
-        config_file.close();
-    };
 
 };
 

@@ -25,7 +25,7 @@ ChatClient::ChatClient(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::ChatClientClass())
     , client(Client::instance())
-    , config_data()
+    , config_data(ConfigData::getConfig())
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
@@ -97,7 +97,7 @@ void ChatClient::on_log_in_button_clicked()
         client->login(ui->login_nickname_edit->text(), ui->login_password_edit->text());
 
         //TODO delete. Just for time
-        //loggedIn();
+        loggedIn({ "Niko",3, {} });
     }
     else
         QMessageBox::information(this, "Warning", "Please input all fields");
@@ -342,8 +342,8 @@ void ChatClient::attemptConnection()
     if (client->socketInfo()->state() == QAbstractSocket::UnconnectedState)
     {
         // We ask the user for the address of the server, we use 127.0.0.1 (aka localhost) as default
-        const QString hostAddress = config_data.getConfServer();
-        const quint16 portAddress = config_data.getConfPort();
+        const QString hostAddress = config_data.getConfig().getConfServer();
+        const quint16 portAddress = config_data.getConfig().getConfPort();
         if (!hostAddress.isEmpty())
             client->connectToServer(QHostAddress(hostAddress), portAddress);
     }
@@ -360,8 +360,8 @@ void ChatClient::attemptConnection()
 void ChatClient::connectedToServer()
 {
     PLOGI << "Client connected correctly";
-    ui->login_nickname_edit->setText(config_data.getConfNickname());
-    ui->login_password_edit->setText(config_data.getConfPassword());
+    ui->login_nickname_edit->setText(config_data.getConfig().getConfNickname());
+    ui->login_password_edit->setText(config_data.getConfig().getConfPassword());
     ui->login_password_edit->setEchoMode(QLineEdit::Password);
     ui->stackedWidget->setCurrentIndex(1);    
 }
@@ -378,8 +378,12 @@ void ChatClient::loginFailed(const QString& reason)
 
 //--LogIn Page -> Profile Page 
 //If client made a loging correctly, use this functuon
-void ChatClient::loggedIn()
+void ChatClient::loggedIn(const UserItem& user_info_)
 {
+    config_data.saveConfig(ui->login_nickname_edit->text(), ui->login_password_edit->text());
+
+
+
     ui->profile_edit_save_button->setText("Edit");
     ui->profile_start_chating_button->setEnabled(true);
 
@@ -403,8 +407,7 @@ void ChatClient::loggedIn()
 //-----Profile Page
 //If client create a user correctly, use this function
 void ChatClient::userCreated(const UserItem& user_) {
-    config_data.setConfNickanme(user_.getUserNickname());
-    config_data.setConfPassword(user_.getUserPassword());
+    config_data.getConfig().saveConfig(ui->login_nickname_edit->text(), ui->login_password_edit->text());
 
     //TODO add about iqon
     ui->profile_edit_save_button->setText("Edit");
@@ -425,8 +428,7 @@ void ChatClient::createUserFailed(const QString& reason) {
 
 //If client made changes with his profile, use this function
 void ChatClient::userEdited(const UserItem& user_) {
-    config_data.setConfNickanme(user_.getUserNickname());
-    config_data.setConfPassword(user_.getUserPassword());
+    config_data.getConfig().saveConfig(ui->profile_nickname_edit->text(), ui->profile_password_edit->text());
 
     //TODO add about iqon
     ui->profile_edit_save_button->setText("Edit");

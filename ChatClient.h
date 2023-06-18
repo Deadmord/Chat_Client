@@ -87,7 +87,7 @@ private slots:
     void attemptConnection();
     void connectedToServer();
     void loginFailed(const QString& reason);
-    void loggedIn();
+    void loggedIn(const UserItem& user_info_);
     void userCreated(const UserItem& user_);
     void userEdited(const UserItem& user_);
     void createUserFailed(const QString& reason);

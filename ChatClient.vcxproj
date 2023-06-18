@@ -110,7 +110,7 @@
   <ItemGroup>
     <QtMoc Include="client.h" />
     <QtMoc Include="UserItem.h" />
-    <QtMoc Include="ConfigService.h" />
+    <ClInclude Include="ConfigService.h" />
     <QtMoc Include="ChatItem.h" />
     <QtMoc Include="ChatWModel.h" />
     <QtMoc Include="ChatWView.h" />
