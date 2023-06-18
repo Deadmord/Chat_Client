@@ -61,6 +61,15 @@ void Client::login(const QString& userNickname_, const QString& userPassword_)
     sendJson(message);
 }
 
+void Client::roomListRequest()
+{
+    // Create the JSON we want to send
+    QJsonObject message;
+    message[QStringLiteral("type")] = QStringLiteral("roomListRequest");
+    // send the JSON
+    sendJson(message);
+}
+
 void Client::entryRoom(quint16 room_number_)
 {
         // Create the JSON we want to send
@@ -120,6 +129,14 @@ void Client::jsonReceived(const QJsonObject& docObj)
         // and notify it via the loginError signal
         const QJsonValue reasonVal = docObj.value(QLatin1String("reason"));
         emit loginError(reasonVal.toString());
+    }
+
+    if (typeVal.toString().compare(QLatin1String("roomList"), Qt::CaseInsensitive) == 0) 
+    {
+        const QJsonArray roomsVal = docObj.value(QLatin1String("rooms")).toArray();
+        if (roomsVal.isEmpty());
+            return; // rooms empty so we ignored
+        // тут разобрать JSON и записать в List комнат
     }
 
     else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message

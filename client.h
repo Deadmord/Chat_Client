@@ -51,6 +51,7 @@ signals:
 public slots:
     void connectToServer(const QHostAddress& address, quint16 port);
     void login(const QString& userNickname_, const QString& userPassword_);
+    void roomListRequest();
     void entryRoom(quint16 room_number_);
     void sendMessage(const QString& text);
     void disconnectFromHost();
