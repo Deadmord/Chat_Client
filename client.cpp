@@ -60,9 +60,6 @@ void Client::login(const QString& userNickname_, const QString& userPassword_)
 //profile
 void Client::createUser(QSharedPointer<DTOUser> shp_dto_user_)
 {
-    //status:
-    //x create
-    //x update
 
     if (shp_dto_user_->getNickname().isEmpty())
         return; 
@@ -122,7 +119,7 @@ void Client::askUserInfo()
 
 void Client::enterRoom(quint16 room_number_)
 {
-    if (room_number_ != 0)
+    if (room_number_ == 0)
         return;
 
     QJsonObject room;
@@ -134,17 +131,17 @@ void Client::enterRoom(quint16 room_number_)
 
 
 //addChat
-void Client::createChat(const ChatItem& chat_)
+void Client::createChat(const chatItemPtr chat_)
 {
-    if (chat_.getChatRoomName().isEmpty() )
+    if (chat_->getChatRoomName().isEmpty() )
         return;
 
     QJsonObject chat_body;
-    chat_body[QStringLiteral("name")] = chat_.getChatRoomName();
-    chat_body[QStringLiteral("description")] = chat_.getChatRoomDescription();
-    chat_body[QStringLiteral("topic")] = chat_.getChatRoomTopicName();
-    chat_body[QStringLiteral("is_private")] = chat_.getChatRoomIsPrivate();
-    chat_body[QStringLiteral("password")] = chat_.getChatRoomPassword();
+    chat_body[QStringLiteral("name")] = chat_->getChatRoomName();
+    chat_body[QStringLiteral("description")] = chat_->getChatRoomDescription();
+    chat_body[QStringLiteral("topic")] = chat_->getChatRoomTopicName();
+    chat_body[QStringLiteral("is_private")] = chat_->getChatRoomIsPrivate();
+    chat_body[QStringLiteral("password")] = chat_->getChatRoomPassword();
 
     QJsonObject user_info;
     user_info[QStringLiteral("type")] = QStringLiteral("createRoom");
@@ -152,8 +149,6 @@ void Client::createChat(const ChatItem& chat_)
 
     sendJson(user_info);
 }
-
-
 
 //messageRoom
 void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
@@ -205,7 +200,6 @@ void Client::sendJson(const QJsonObject& doc, const QString&  type, const QByteA
 void Client::disconnectFromHost()
 {
     client_socket->disconnectFromHost();
-    initSocket();
 }
 
 void Client::jsonReceived(const QJsonObject& docObj)
@@ -282,25 +276,24 @@ void Client::jsonReceived(const QJsonObject& docObj)
         emit messageReceived(msg_);
         return;
     }
-    else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message
-        // we extract the text field containing the chat text
-        const QJsonValue textId = docObj.value(QLatin1String("id"));
 
-        // we extract the text field containing the chat text
-        const QJsonValue textVal = docObj.value(QLatin1String("text"));
-        // we extract the sender field containing the username of the sender
-        const QJsonValue senderVal = docObj.value(QLatin1String("sender"));
-        if (textVal.isNull() || !textVal.isString())
-            return; // the text field was invalid so we ignore
-        if (senderVal.isNull() || !senderVal.isString())
-            return; // the sender field was invalid so we ignore
-        const QJsonValue imageIdVal = docObj.value(QLatin1String("image"));
-        // we extract the sender field containing the username of the sender
-        // we notify a new message was received via the messageReceived signal
 
-        //MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
-        DTOMessage msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
-        emit messageReceived(msg_);
+    else if (typeVal.toString().compare(QLatin1String("newuser"), Qt::CaseInsensitive) == 0) { // A user joined the chat
+        // we extract the username of the new user
+        const QJsonValue usernameVal = docObj.value(QLatin1String("username"));
+        if (usernameVal.isNull() || !usernameVal.isString())
+            return; // the username was invalid so we ignore
+        // we notify of the new user via the userJoined signal
+        emit userJoined(usernameVal.toString());
+    }
+
+    else if (typeVal.toString().compare(QLatin1String("userdisconnected"), Qt::CaseInsensitive) == 0) { // A user left the chat
+        // we extract the username of the new user
+        const QJsonValue usernameVal = docObj.value(QLatin1String("username"));
+        if (usernameVal.isNull() || !usernameVal.isString())
+            return; // the username was invalid so we ignore
+        // we notify of the user disconnection the userLeft signal
+        emit userLeft(usernameVal.toString());
     }
 
     else if (typeVal.toString().compare(QLatin1String("myUserData"), Qt::CaseInsensitive) == 0) { // A user joined the chat
@@ -320,23 +313,40 @@ void Client::jsonReceived(const QJsonObject& docObj)
         emit userInfoComed(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
     }
 
-    else if (typeVal.toString().compare(QLatin1String("newuser"), Qt::CaseInsensitive) == 0) { // A user joined the chat
-        // we extract the username of the new user
-        const QJsonValue usernameVal = docObj.value(QLatin1String("username"));
+    else if (typeVal.toString().compare(QLatin1String("userpicChanged"), Qt::CaseInsensitive) == 0) { // A user joined the chat
+        const QJsonObject user_info_json = docObj.value(QLatin1String("userinfo")).toObject();
+        if (user_info_json.isEmpty())
+            return; // the userinfo has to not empty so we ignore
+        const QJsonValue usernameVal = user_info_json.value(QLatin1String("username"));
         if (usernameVal.isNull() || !usernameVal.isString())
             return; // the username was invalid so we ignore
-        // we notify of the new user via the userJoined signal
-        emit userJoined(usernameVal.toString());
+        const QJsonValue userPic = user_info_json.value(QLatin1String("userpic"));
+        const QJsonValue userRating = user_info_json.value(QLatin1String("rating"));
+
+        user_nickname = usernameVal.toString();
+        user_pic = userPic.toString();
+        user_rating = userRating.toInt();
+        //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
+        emit userInfoComed(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
     }
 
-    else if (typeVal.toString().compare(QLatin1String("userdisconnected"), Qt::CaseInsensitive) == 0) { // A user left the chat
-        // we extract the username of the new user
-        const QJsonValue usernameVal = docObj.value(QLatin1String("username"));
+    else if (typeVal.toString().compare(QLatin1String("passwordChanged"), Qt::CaseInsensitive) == 0) { // A user joined the chat
+        const QJsonObject user_info_json = docObj.value(QLatin1String("userinfo")).toObject();
+        if (user_info_json.isEmpty())
+            return; // the userinfo has to not empty so we ignore
+        const QJsonValue usernameVal = user_info_json.value(QLatin1String("username"));
         if (usernameVal.isNull() || !usernameVal.isString())
             return; // the username was invalid so we ignore
-        // we notify of the user disconnection the userLeft signal
-        emit userLeft(usernameVal.toString());
+        const QJsonValue userPic = user_info_json.value(QLatin1String("userpic"));
+        const QJsonValue userRating = user_info_json.value(QLatin1String("rating"));
+
+        user_nickname = usernameVal.toString();
+        user_pic = userPic.toString();
+        user_rating = userRating.toInt();
+        //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
+        emit userInfoComed(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
     }
+
 }
 
 

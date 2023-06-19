@@ -77,6 +77,7 @@ ChatClient::ChatClient(QWidget* parent)
     connect(client, &Client::loggedIn, this, &ChatClient::loggedIn);
     connect(client, &Client::messageReceived, this, &ChatClient::messageReceived);
     connect(client, &Client::chatListRecived, this, &ChatClient::chatListRecived);
+    connect(client, &Client::userInfoComed, this, &ChatClient::userDataRecived);
     //connect(client, &Client::roomCreated, this, &ChatClient::roomCreated); //TODO MAKE in client
 
     connect(client, &Client::disconnected, this, &ChatClient::disconnectedFromServer); //TODO make a buttton to disconnect
@@ -85,6 +86,7 @@ ChatClient::ChatClient(QWidget* parent)
 
 ChatClient::~ChatClient()
 {
+
     delete ui;
 }
 
@@ -109,6 +111,7 @@ void ChatClient::on_sign_in_button_clicked()
 {
     ui->profile_change_password_button->hide();
     ui->profile_change_avatar_button->hide();
+    ui->profile_raiting_text->setText(0);
     ui->profile_start_chating_button->setEnabled(false);
 
     QPixmap pixmap("./images/avatar.png");
@@ -122,8 +125,6 @@ void ChatClient::on_sign_in_button_clicked()
 
 void ChatClient::on_start_chatting_clicked() {
     ui->text_edit->setPlaceholderText("Enter message text here");
-    ui->stackedWidget->setCurrentIndex(3);
-
 
     client->roomListRequest();
 }
@@ -155,7 +156,7 @@ void ChatClient::onChangeButtonAvatarClicked()
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     buffer.open(QIODevice::WriteOnly);
-    QPixmap pixmap(ui->add_attach_button->property("attached").toString());
+    QPixmap pixmap(ui->profile_change_avatar_button->property("attached").toString());
     // Save the pixmap as a PNG image
     pixmap.save(&buffer, "PNG");
 
@@ -169,11 +170,13 @@ void ChatClient::onChangeButtonAvatarClicked()
     }
 
 
-    QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
+    QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>( new DTOUser(
         ui->profile_nickname_edit->text(),
         ui->profile_raiting_text->text().toInt(),
         QString::fromUtf8(byteArray)
+    )
     );
+
     client->updateUserPic(dto_user);
 
 }
@@ -296,6 +299,14 @@ void ChatClient::onCreateClicked()
 {
     if (!ui->add_room_name_edit->text().isEmpty() && !ui->add_room_descr_edit->toPlainText().isEmpty() && !ui->add_room_combo_box->currentText().isEmpty()) {
         //TODO send a dtat for server
+        client->createChat(chatItemPtr{ new ChatItem(
+                1
+                , ui->add_room_name_edit->text()
+                , ui->add_room_descr_edit->toPlainText()
+                , ui->add_room_combo_box->currentText()
+                , ui->add_room_private_check_box->isTristate()
+                , ui->add_room_password_edit->text()) }
+        );
 
         //TODO delete. Just for time
         ui->stackedWidget->setCurrentIndex(3);
@@ -358,6 +369,7 @@ void ChatClient::on_sendButton_clicked()
         IsCurrentInputLanguageRTL(),
         listlikes, 
         message_image_id);
+
     client->sendMessage(dto_message);
     //messageItem -> dto
 
@@ -405,6 +417,11 @@ void ChatClient::keyPressEvent(QKeyEvent* event_)
     QMainWindow::keyPressEvent(event);*/
 }
 
+void ChatClient::closeEvent(QCloseEvent* event)
+{
+    client->disconnectFromHost();
+    QMainWindow::closeEvent(event);
+}
 void ChatClient::onReactionClick(const Likes& mes_user_likes_) 
 {
     //TODO send to client data
@@ -502,22 +519,33 @@ void ChatClient::createUserFailed(const QString& reason) {
 }
 
 //If client change Avatar correctly, use this function
-void ChatClient::userAvatarUpdated(const UserItem& user_)
+void ChatClient::userAvatarUpdated(const DTOUser& dto_user_)
 {
     ui->profile_change_avatar_button->setText("Change Avatar");
     QMessageBox::information(this, "Success", "Avatar was changed");
-    PLOGI << "Avatar " << user_.getUserNickname() << " changed correctly";
+    PLOGI << "Avatar " << dto_user_.getNickname() << " changed correctly";
 }
 
 //If client change Password correctly, use this function
-void ChatClient::userPasswordUpdated(const UserItem& user_)
+void ChatClient::userPasswordUpdated(const DTOUser& dto_user_)
 {
-    config_data.getConfig().saveConfig(user_.getUserNickname(), ui->profile_password_edit->text());
+    config_data.getConfig().saveConfig(dto_user_.getNickname(), ui->profile_password_edit->text());
     ui->profile_change_avatar_button->setText("Change password");
     QMessageBox::information(this, "Success", "Password was changed");
-    PLOGI << "Password " << user_.getUserNickname() << " changed correctly";
+    PLOGI << "Password " << dto_user_.getNickname() << " changed correctly";
 }
 
+//If client recive UserData, use this function
+void ChatClient::userDataRecived(const DTOUser& dto_user_) {
+    QSharedPointer<UserItem> user = DTOUser::createUserItemFromDTOUser(dto_user_);
+    ui->profile_raiting_text->setText(QString::number(user->getUserRating()));
+
+    
+    QPixmap pixmap = user->getUserAvatar().pixmap(QSize(200, 200));
+    ui->profile_image_lable->setPixmap(pixmap);
+    ui->profile_raiting_text->setText(QString::number(user->getUserRating()));
+
+}
 
 //-----ChatList Page
 // 
@@ -585,6 +613,7 @@ void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
 //If new mess recieved (download list of messages)
 void ChatClient::chatListRecived(const chatList& list_of_chats)
 {
+    ui->stackedWidget->setCurrentIndex(3);
     QVariantList var_list;
     for (const chatItemPtr& chat_item : list_of_chats) {
         var_list.append(
