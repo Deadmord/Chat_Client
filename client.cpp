@@ -122,7 +122,7 @@ void Client::askUserInfo()
 
 void Client::enterRoom(quint16 room_number_)
 {
-    if (room_number_ != 0)
+    if (room_number_ == 0)
         return;
 
     QJsonObject room;
