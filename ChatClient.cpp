@@ -209,7 +209,7 @@ void ChatClient::onChangeButtonPasswordClicked()
     QPixmap pixmap(ui->profile_image_lable->pixmap());
     pixmap.save(&buffer, "PNG");
 
-    if (!ui->profile_password_edit->text().isNull()) {
+    if (!ui->profile_password_edit->text().isEmpty()) {
         QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
             ui->profile_nickname_edit->text(),
             ui->profile_raiting_text->text().toInt(),
@@ -230,7 +230,7 @@ void ChatClient::onSaveClicked() {
     QPixmap pixmap(ui->profile_image_lable->pixmap());
     pixmap.save(&buffer, "PNG");
 
-    if (!ui->profile_nickname_edit->text().isNull() && !ui->profile_nickname_edit->text().isNull()) {
+    if (!ui->profile_nickname_edit->text().isEmpty() && !ui->profile_nickname_edit->text().isEmpty()) {
         //TODO send to client changed info
         QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
             ui->profile_nickname_edit->text(),
