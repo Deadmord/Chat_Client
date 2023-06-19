@@ -192,9 +192,10 @@ void Client::sendJson(const QJsonObject& doc, const QString&  type, const QByteA
         QDataStream clientStream(&buffer, QIODevice::WriteOnly);
         // set the version so that programs compiled with different versions of Qt can agree on how to serialise
         clientStream.setVersion(QDataStream::Qt_6_5);
+        
         // reserv size part in stream and send the JSON using QDataStream
         const QByteArray jsonData = QJsonDocument(doc).toJson();
-        clientStream << quint16(0) << type << jsonData << data_;
+        clientStream << quint16(0) << type<< jsonData <<data_;
         clientStream.device()->seek(0); //go to beginning data storage
         clientStream << quint16(buffer.size() - sizeof(quint16));
         client_socket->write(buffer);
