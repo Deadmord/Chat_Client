@@ -226,6 +226,7 @@ void ChatClient::onSaveClicked() {
 
 void ChatClient::onChatClicked(qint32 chat_id_)
 {
+    client->enterRoom(chat_id_);
     //client->setRoomNum(chat_id_);
     //TODO send to server new current room
 
@@ -286,7 +287,7 @@ void ChatClient::onAddChatButtonClicked()
 
 void ChatClient::onProfileClicked()
 {
-    //TODO ask from Server data about user (in client emit loggedIn)
+    client->askUserInfo();
 };
 
 //-----Chat Create Page
