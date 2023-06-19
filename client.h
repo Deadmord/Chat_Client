@@ -52,6 +52,8 @@ signals:
     void errorSignal(QAbstractSocket::SocketError socket_error);
     void userInfoComed(const DTOUser& dto_user_);
 
+    void createRoomSuccess();
+
     void userJoined(const QString& username);
     void userLeft(const QString& username);
 

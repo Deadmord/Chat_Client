@@ -211,6 +211,15 @@ void Client::jsonReceived(const QJsonObject& docObj)
 {
     // actions depend on the type of message
     const QJsonValue typeVal = docObj.value(QLatin1String("type"));
+    const QJsonValue typeChat = docObj.value(QLatin1String("createChat"));
+    if (typeChat.isNull() || !typeChat.isString())
+        return;
+
+    if (typeChat.toString().compare(QLatin1String("success"), Qt::CaseInsensitive) == 0) {
+        emit createRoomSuccess();
+    }
+
+
     if (typeVal.isNull() || !typeVal.isString())
         return; // a message with no type was received so we just ignore it
 

@@ -96,9 +96,10 @@ private slots:
 
     void messageReceived(const DTOMessage& msg_);
     void messageListReceived(const QList<MessageItem>& list_of_mess);
-    void roomCreated(const ChatItem& chat_);
+    void roomCreated();
     void chatListRecived(const chatList& list_of_mess);
     void topicsComes(const QStringList& topics_);
+
     void connectedToRoom(const QList<MessageItem>& list_of_mess);
     void userAvatarUpdated(const UserItem& user_);
     void userPasswordUpdated(const UserItem& user_);

@@ -77,6 +77,8 @@ ChatClient::ChatClient(QWidget* parent)
     connect(client, &Client::loggedIn, this, &ChatClient::loggedIn);
     connect(client, &Client::messageReceived, this, &ChatClient::messageReceived);
     connect(client, &Client::chatListRecived, this, &ChatClient::chatListRecived);
+
+    connect(client, &Client::createRoomSuccess, this, &ChatClient::roomCreated);
     //connect(client, &Client::roomCreated, this, &ChatClient::roomCreated); //TODO MAKE in client
 
     connect(client, &Client::disconnected, this, &ChatClient::disconnectedFromServer); //TODO make a buttton to disconnect
@@ -539,29 +541,22 @@ void ChatClient::topicsComes(const QStringList& topics_)
     ui->stackedWidget->setCurrentIndex(5);
 }
 
+
+
 //-----Chat Create Page
 // 
 //--Chat Create Page -> ChatList Page 
 //If chat created correctly, use this function
-void ChatClient::roomCreated(const ChatItem& chat_) 
+void ChatClient::roomCreated() 
 {
-    //TODO delete
-    Q_EMIT new_chat(
-        QVariant::fromValue<chatItemPtr>
-        (
-            chatItemPtr{ new ChatItem(
-                  chat_.getChatId()
-                , chat_.getChatRoomName()
-                , chat_.getChatRoomDescription()
-                , chat_.getChatRoomTopicName()
-                , chat_.getChatRoomIsPrivate()
-                , chat_.getChatRoomPassword()) }
-        )
-    );
+    QMessageBox::information(this, "Success", "Room was created");
+
+    client->roomListRequest();
 }
 
 void ChatClient::connectedToRoom(const QList<MessageItem>& list_of_mess) 
 {
+
  //TODO ask client for sending n-messages   
 }
 
@@ -569,6 +564,8 @@ void ChatClient::connectedToRoom(const QList<MessageItem>& list_of_mess)
 //If new mess recieved (download list of messages)
 void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
 {
+    ui->stackedWidget->setCurrentIndex(3);
+
     QVariantList var_list;
     for (const MessageItem& mes_item : list_of_mess) {
         var_list.append(
