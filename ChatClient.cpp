@@ -296,6 +296,14 @@ void ChatClient::onCreateClicked()
 {
     if (!ui->add_room_name_edit->text().isEmpty() && !ui->add_room_descr_edit->toPlainText().isEmpty() && !ui->add_room_combo_box->currentText().isEmpty()) {
         //TODO send a dtat for server
+        client->createChat(chatItemPtr{ new ChatItem(
+                1
+                , ui->add_room_name_edit->text()
+                , ui->add_room_descr_edit->toPlainText()
+                , ui->add_room_combo_box->currentText()
+                , ui->add_room_private_check_box->isTristate()
+                , ui->add_room_password_edit->text()) }
+        );
 
         //TODO delete. Just for time
         ui->stackedWidget->setCurrentIndex(3);

@@ -72,7 +72,7 @@ public slots:
     void enterRoom(quint16 room_number_);
 
     //addChat
-    void createChat(const ChatItem& chat_);
+    void createChat(const chatItemPtr chat_);
 
     //message
     void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_);
