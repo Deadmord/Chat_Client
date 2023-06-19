@@ -281,26 +281,26 @@ void Client::jsonReceived(const QJsonObject& docObj)
         emit messageReceived(msg_);
         return;
     }
-    else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message
-        // we extract the text field containing the chat text
-        const QJsonValue textId = docObj.value(QLatin1String("id"));
+    //else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message
+    //    // we extract the text field containing the chat text
+    //    const QJsonValue textId = docObj.value(QLatin1String("id"));
 
-        // we extract the text field containing the chat text
-        const QJsonValue textVal = docObj.value(QLatin1String("text"));
-        // we extract the sender field containing the username of the sender
-        const QJsonValue senderVal = docObj.value(QLatin1String("sender"));
-        if (textVal.isNull() || !textVal.isString())
-            return; // the text field was invalid so we ignore
-        if (senderVal.isNull() || !senderVal.isString())
-            return; // the sender field was invalid so we ignore
-        const QJsonValue imageIdVal = docObj.value(QLatin1String("image"));
-        // we extract the sender field containing the username of the sender
-        // we notify a new message was received via the messageReceived signal
+    //    // we extract the text field containing the chat text
+    //    const QJsonValue textVal = docObj.value(QLatin1String("text"));
+    //    // we extract the sender field containing the username of the sender
+    //    const QJsonValue senderVal = docObj.value(QLatin1String("sender"));
+    //    if (textVal.isNull() || !textVal.isString())
+    //        return; // the text field was invalid so we ignore
+    //    if (senderVal.isNull() || !senderVal.isString())
+    //        return; // the sender field was invalid so we ignore
+    //    const QJsonValue imageIdVal = docObj.value(QLatin1String("image"));
+    //    // we extract the sender field containing the username of the sender
+    //    // we notify a new message was received via the messageReceived signal
 
-        //MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
-        DTOMessage msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
-        emit messageReceived(msg_);
-    }
+    //    //MessageItem msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
+    //    DTOMessage msg_(textId.toString(), senderVal.toString(), textVal.toString(), false, {}, imageIdVal.toString());
+    //    emit messageReceived(msg_);
+    //}
 
     else if (typeVal.toString().compare(QLatin1String("myUserData"), Qt::CaseInsensitive) == 0) { // A user joined the chat
         const QJsonObject user_info_json = docObj.value(QLatin1String("userinfo")).toObject();
