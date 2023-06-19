@@ -359,14 +359,15 @@ void ChatClient::on_sendButton_clicked()
 
 
     //TODO send to server full data 
-    /*QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(
+    QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(
         id.toString(), 
         config_data.getConfig().getConfNickname(),
         ui->text_edit->toPlainText(),
         IsCurrentInputLanguageRTL(),
         listlikes, 
         message_image_id);
-    client->sendMessage(dto_message);*/
+
+    client->sendMessage(dto_message);
     //messageItem -> dto
 
     ui->add_attach_button->setText(QString("Attach files"));
