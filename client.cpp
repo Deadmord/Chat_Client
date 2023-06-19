@@ -60,9 +60,6 @@ void Client::login(const QString& userNickname_, const QString& userPassword_)
 //profile
 void Client::createUser(QSharedPointer<DTOUser> shp_dto_user_)
 {
-    //status:
-    //x create
-    //x update
 
     if (shp_dto_user_->getNickname().isEmpty())
         return; 
@@ -153,8 +150,6 @@ void Client::createChat(const chatItemPtr chat_)
     sendJson(user_info);
 }
 
-
-
 //messageRoom
 void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
 {
@@ -204,7 +199,6 @@ void Client::sendJson(const QJsonObject& doc)
 void Client::disconnectFromHost()
 {
     client_socket->disconnectFromHost();
-    initSocket();
 }
 
 void Client::jsonReceived(const QJsonObject& docObj)

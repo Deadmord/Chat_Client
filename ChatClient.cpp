@@ -86,6 +86,7 @@ ChatClient::ChatClient(QWidget* parent)
 
 ChatClient::~ChatClient()
 {
+
     delete ui;
 }
 
@@ -110,6 +111,7 @@ void ChatClient::on_sign_in_button_clicked()
 {
     ui->profile_change_password_button->hide();
     ui->profile_change_avatar_button->hide();
+    ui->profile_raiting_text->setText(0);
     ui->profile_start_chating_button->setEnabled(false);
 
     QPixmap pixmap("./images/avatar.png");
@@ -415,6 +417,11 @@ void ChatClient::keyPressEvent(QKeyEvent* event_)
     QMainWindow::keyPressEvent(event);*/
 }
 
+void ChatClient::closeEvent(QCloseEvent* event)
+{
+    client->disconnectFromHost();
+    QMainWindow::closeEvent(event);
+}
 void ChatClient::onReactionClick(const Likes& mes_user_likes_) 
 {
     //TODO send to client data

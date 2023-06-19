@@ -1,7 +1,9 @@
 #include "ChatClient.h"
 #include <QtWidgets/QApplication>
 #include <plog/Log.h> 
+#include <QObject>
 #include <plog/Initializers/RollingFileInitializer.h>
+
 
 int main(int argc, char* argv[])
 {
