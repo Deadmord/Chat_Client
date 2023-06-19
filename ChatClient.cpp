@@ -96,9 +96,6 @@ void ChatClient::on_log_in_button_clicked()
 {
     if (!ui->login_nickname_edit->text().isEmpty() && !ui->login_password_edit->text().isEmpty()) {
         client->login(ui->login_nickname_edit->text(), ui->login_password_edit->text());
-
-        //TODO delete. Just for time
-        //loggedIn({ "Niko",3, {} });
     }
     else
         QMessageBox::information(this, "Warning", "Please input all fields");
@@ -121,30 +118,7 @@ void ChatClient::on_start_chatting_clicked() {
     ui->text_edit->setPlaceholderText("Enter message text here");
     ui->stackedWidget->setCurrentIndex(3);
 
-    auto listik = QVariantList{
-        QVariant::fromValue<chatItemPtr>
-        (
-            chatItemPtr{ new ChatItem(
-                1
-                , "Name_1"
-                , "Description_1"
-                , "Lable_1"
-                , false)
-            }
-        ),
-        QVariant::fromValue<chatItemPtr>
-        (
-            chatItemPtr{ new ChatItem(
-                2
-                , "Name_2"
-                , "Description_2"
-                , "Lable_2"
-                , false)
-            }
-        )
-    };
-
-    Q_EMIT download_chats(listik);
+    client->roomListRequest();
 }
 
 void ChatClient::onSaveEditClicked() {
@@ -178,7 +152,6 @@ void ChatClient::onSaveEditClicked() {
 
 void ChatClient::onChatClicked(qint32 chat_id_)
 {
-client->roomListRequest();
     //client->setRoomNum(chat_id_);
     //TODO send to server new current room
 
