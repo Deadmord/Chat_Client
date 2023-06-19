@@ -44,12 +44,7 @@ void Client::connectToServer(const QHostAddress& address, quint16 port)
     client_socket->connectToHost(address, port);
     emit connected();
 }
-
-void Client::disconnectFromHost()
-{
-    client_socket->disconnectFromHost();
-    initSocket();
-}
+//login
 
 void Client::login(const QString& userNickname_, const QString& userPassword_)
 {
@@ -62,46 +57,7 @@ void Client::login(const QString& userNickname_, const QString& userPassword_)
     sendJson(message);
 }
 
-void Client::roomListRequest()
-{
-    // Create the JSON we want to send
-    QJsonObject message;
-    message[QStringLiteral("type")] = QStringLiteral("roomListRequest");
-    // send the JSON
-    sendJson(message);
-}
-
-void Client::entryRoom(quint16 room_number_)
-{
-        // Create the JSON we want to send
-        QJsonObject message;
-        message[QStringLiteral("type")] = QStringLiteral("roomEntry");
-        message[QStringLiteral("room")] = room_number_;
-        sendJson(message);
-}
-
-void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
-{
-    if (shp_dto_message_->getMessageText().isEmpty())
-        return; // We don't send empty messages
-    // Create the JSON we want to send
-
-    QJsonObject messagebody;
-    messagebody[QStringLiteral("id")] = shp_dto_message_->getMessageId();
-    messagebody[QStringLiteral("parentid")] = "";
-    messagebody[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
-    messagebody[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
-    messagebody[QStringLiteral("text")] = shp_dto_message_->getMessageText();
-    messagebody[QStringLiteral("mediaid")] = "";
-    messagebody[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
-    messagebody[QStringLiteral("likes")] = QJsonObject();
-
-    QJsonObject message;
-    message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("messagebody")] = messagebody;
-    sendJson(message);
-}
-
+//profile
 void Client::createUser(QSharedPointer<DTOUser> shp_dto_user_)
 {
     //status:
@@ -146,16 +102,109 @@ void Client::updateUserPassword(QSharedPointer<DTOUser> shp_dto_user_)
     sendJson(user);
 }
 
-void Client::enterRoom(quint16 room_number_)
+void Client::roomListRequest()
 {
-    if (room_number_ != 0)
-        return;
+    // Create the JSON we want to send
+    QJsonObject message;
+    message[QStringLiteral("type")] = QStringLiteral("roomListRequest");
+    // send the JSON
+    sendJson(message);
+}
 
+//chatList
+void Client::askUserInfo()
+{
     QJsonObject user;
-    user[QStringLiteral("type")] = QStringLiteral("roomEntry");
-    user[QStringLiteral("room")] = room_number_;
+    user[QStringLiteral("type")] = QStringLiteral("askCurrentUser");
 
     sendJson(user);
+}
+
+void Client::enterRoom(quint16 room_number_)
+{
+    if (room_number_ == 0)
+        return;
+
+    QJsonObject room;
+    room[QStringLiteral("type")] = QStringLiteral("roomEntry");
+    room[QStringLiteral("room")] = room_number_;
+
+    sendJson(room);
+}
+
+
+//addChat
+void Client::createChat(const chatItemPtr chat_)
+{
+    if (chat_->getChatRoomName().isEmpty() )
+        return;
+
+    QJsonObject chat_body;
+    chat_body[QStringLiteral("name")] = chat_->getChatRoomName();
+    chat_body[QStringLiteral("description")] = chat_->getChatRoomDescription();
+    chat_body[QStringLiteral("topic")] = chat_->getChatRoomTopicName();
+    chat_body[QStringLiteral("is_private")] = chat_->getChatRoomIsPrivate();
+    chat_body[QStringLiteral("password")] = chat_->getChatRoomPassword();
+
+    QJsonObject user_info;
+    user_info[QStringLiteral("type")] = QStringLiteral("createRoom");
+    user_info[QStringLiteral("chatbody")] = chat_body;
+
+    sendJson(user_info);
+}
+
+
+
+//messageRoom
+void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
+{
+    if (shp_dto_message_->getMessageText().isEmpty())
+        return; // We don't send empty messages
+    // Create the JSON we want to send
+
+    QJsonObject messagebody;
+    messagebody[QStringLiteral("id")] = shp_dto_message_->getMessageId();
+    messagebody[QStringLiteral("parentid")] = "";
+    messagebody[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
+    messagebody[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
+    messagebody[QStringLiteral("text")] = shp_dto_message_->getMessageText();
+    messagebody[QStringLiteral("mediaid")] = "";
+    messagebody[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
+    messagebody[QStringLiteral("likes")] = QJsonObject();
+
+    QJsonObject message;
+    message[QStringLiteral("type")] = QStringLiteral("message");
+    message[QStringLiteral("messagebody")] = messagebody;
+    sendJson(message);
+}
+
+
+
+
+
+
+void Client::sendJson(const QJsonObject& doc)
+{
+    if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
+        QByteArray buffer;
+        buffer.clear();
+        // create a QDataStream for buffer operating 
+        QDataStream clientStream(&buffer, QIODevice::WriteOnly);
+        // set the version so that programs compiled with different versions of Qt can agree on how to serialise
+        clientStream.setVersion(QDataStream::Qt_6_5);
+        // reserv size part in stream and send the JSON using QDataStream
+        const QByteArray jsonData = QJsonDocument(doc).toJson();
+        clientStream << quint16(0) << jsonData;
+        clientStream.device()->seek(0); //go to beginning data storage
+        clientStream << quint16(buffer.size() - sizeof(quint16));
+        client_socket->write(buffer);
+    }
+}
+
+void Client::disconnectFromHost()
+{
+    client_socket->disconnectFromHost();
+    initSocket();
 }
 
 void Client::jsonReceived(const QJsonObject& docObj)
@@ -253,6 +302,23 @@ void Client::jsonReceived(const QJsonObject& docObj)
         emit messageReceived(msg_);
     }
 
+    else if (typeVal.toString().compare(QLatin1String("myUserData"), Qt::CaseInsensitive) == 0) { // A user joined the chat
+        const QJsonObject user_info_json = docObj.value(QLatin1String("userinfo")).toObject();
+        if (user_info_json.isEmpty())
+            return; // the userinfo has to not empty so we ignore
+        const QJsonValue usernameVal = user_info_json.value(QLatin1String("username"));
+        if (usernameVal.isNull() || !usernameVal.isString())
+            return; // the username was invalid so we ignore
+        const QJsonValue userPic = user_info_json.value(QLatin1String("userpic"));
+        const QJsonValue userRating = user_info_json.value(QLatin1String("rating"));
+
+        user_nickname = usernameVal.toString();
+        user_pic = userPic.toString();
+        user_rating = userRating.toInt();
+        //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
+        emit userInfoComed(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
+    }
+
     else if (typeVal.toString().compare(QLatin1String("newuser"), Qt::CaseInsensitive) == 0) { // A user joined the chat
         // we extract the username of the new user
         const QJsonValue usernameVal = docObj.value(QLatin1String("username"));
@@ -324,23 +390,6 @@ void Client::jsonReceived(const QJsonObject& docObj)
 
 }
 
-void Client::sendJson(const QJsonObject& doc)
-{
-    if (client_socket->state() == QAbstractSocket::ConnectedState) { // if the client is connected
-        QByteArray buffer;
-        buffer.clear();
-        // create a QDataStream for buffer operating 
-        QDataStream clientStream(&buffer, QIODevice::WriteOnly);
-        // set the version so that programs compiled with different versions of Qt can agree on how to serialise
-        clientStream.setVersion(QDataStream::Qt_6_5);
-        // reserv size part in stream and send the JSON using QDataStream
-        const QByteArray jsonData = QJsonDocument(doc).toJson();
-        clientStream << quint16(0) << jsonData;
-        clientStream.device()->seek(0); //go to beginning data storage
-        clientStream << quint16(buffer.size() - sizeof(quint16));
-        client_socket->write(buffer);
-    }
-}
 
 void Client::onReadyRead()
 {

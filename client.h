@@ -56,14 +56,25 @@ signals:
 
 public slots:
     void connectToServer(const QHostAddress& address, quint16 port);
+
+    //login
     void login(const QString& userNickname_, const QString& userPassword_);
-    void roomListRequest();
-    void entryRoom(quint16 room_number_);
-    void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_);
+
+    //profile
     void createUser(QSharedPointer<DTOUser> shp_dto_user_);
     void updateUserPic(QSharedPointer<DTOUser> shp_dto_user_);
     void updateUserPassword(QSharedPointer<DTOUser> shp_dto_user_);
+    void roomListRequest();
+
+    //chatList
+    void askUserInfo();
     void enterRoom(quint16 room_number_);
+
+    //addChat
+    void createChat(const chatItemPtr chat_);
+
+    //message
+    void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_);
 
     void disconnectFromHost();
 private slots:
