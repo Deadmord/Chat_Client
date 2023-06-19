@@ -83,7 +83,7 @@ void Client::updateUserPic(QSharedPointer<DTOUser> shp_dto_user_)
 
     QJsonObject user;
     user[QStringLiteral("type")] = QStringLiteral("changeUserPic");
-    user[QStringLiteral("username")] = shp_dto_user_->getNickname();
+    user[QStringLiteral("nickname")] = shp_dto_user_->getNickname();
     user[QStringLiteral("userpic")] = shp_dto_user_->getUserpic();
 
     sendJson(user);
