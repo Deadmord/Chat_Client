@@ -139,9 +139,21 @@ void Client::updateUserPassword(QSharedPointer<DTOUser> shp_dto_user_)
         return;
 
     QJsonObject user;
-    user[QStringLiteral("type")] = QStringLiteral("changeUserPic");
+    user[QStringLiteral("type")] = QStringLiteral("changePassword");
     user[QStringLiteral("username")] = shp_dto_user_->getNickname();
     user[QStringLiteral("password")] = shp_dto_user_->getPassword();
+
+    sendJson(user);
+}
+
+void Client::enterRoom(quint16 room_number_)
+{
+    if (room_number_ != 0)
+        return;
+
+    QJsonObject user;
+    user[QStringLiteral("type")] = QStringLiteral("roomEntry");
+    user[QStringLiteral("room")] = room_number_;
 
     sendJson(user);
 }
