@@ -100,8 +100,9 @@ private slots:
     void chatListRecived(const chatList& list_of_mess);
     void topicsComes(const QStringList& topics_);
     void connectedToRoom(const QList<MessageItem>& list_of_mess);
-    void userAvatarUpdated(const UserItem& user_);
-    void userPasswordUpdated(const UserItem& user_);
+    void userAvatarUpdated(const DTOUser& dto_user_);
+    void userPasswordUpdated(const DTOUser& dto_user_);
+    void userDataRecived(const DTOUser& dto_user_);
 
     void likeReceivedServer(const Likes& like_);
 
@@ -110,6 +111,8 @@ private slots:
 protected:
 
     void keyPressEvent(QKeyEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
+    
 
 private:
     Ui::ChatClientClass *ui;
