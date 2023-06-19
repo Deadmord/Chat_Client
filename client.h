@@ -50,7 +50,7 @@ signals:
     void messageReceived(const DTOMessage& msg_);
     void chatListRecived(const chatList& roomItems);
     void errorSignal(QAbstractSocket::SocketError socket_error);
-
+    void userInfoComed(const DTOUser& dto_user_);
     void userJoined(const QString& username);
     void userLeft(const QString& username);
 
