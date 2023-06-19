@@ -122,8 +122,6 @@ void ChatClient::on_sign_in_button_clicked()
 
 void ChatClient::on_start_chatting_clicked() {
     ui->text_edit->setPlaceholderText("Enter message text here");
-    ui->stackedWidget->setCurrentIndex(3);
-
 
     client->roomListRequest();
 }
@@ -359,14 +357,15 @@ void ChatClient::on_sendButton_clicked()
 
 
     //TODO send to server full data 
-    /*QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(
+    QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(
         id.toString(), 
         config_data.getConfig().getConfNickname(),
         ui->text_edit->toPlainText(),
         IsCurrentInputLanguageRTL(),
         listlikes, 
         message_image_id);
-    client->sendMessage(dto_message);*/
+
+    client->sendMessage(dto_message);
     //messageItem -> dto
 
     ui->add_attach_button->setText(QString("Attach files"));
@@ -593,6 +592,7 @@ void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
 //If new mess recieved (download list of messages)
 void ChatClient::chatListRecived(const chatList& list_of_chats)
 {
+    ui->stackedWidget->setCurrentIndex(3);
     QVariantList var_list;
     for (const chatItemPtr& chat_item : list_of_chats) {
         var_list.append(
