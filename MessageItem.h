@@ -8,6 +8,7 @@
 
 #include "Styles.h"
 #include "LikeItem.h"
+#include "ConfigService.h"
 
 
 
@@ -19,6 +20,7 @@ class MessageItem : public QObject, public QEnableSharedFromThis<MessageItem>
 	Q_OBJECT;
 public:
 	QString	EXAMPLENAME = "Anton"; //TODO change for name from client/config
+
 
 	struct messageToSend {
 		QString message_text;
@@ -182,6 +184,7 @@ private:
 	QRect			message_dislike_butt_rect{};
 	int				message_current_row{ -1 };
 
+	const QString	message_own_nickname;
 };
 
 using messageItemPtr = QSharedPointer<MessageItem>;

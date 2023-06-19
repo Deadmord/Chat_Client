@@ -109,10 +109,11 @@ void Client::roomListRequest()
 }
 
 //chatList
-void Client::askUserInfo()
+void Client::askUserInfo(const QString& nickname_)
 {
     QJsonObject user;
     user[QStringLiteral("type")] = QStringLiteral("askCurrentUser");
+    user[QStringLiteral("nickname")] = nickname_;
 
     sendJson(user);
 }
@@ -173,6 +174,14 @@ void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
     sendJson(message);
 }
 
+void Client::exitRoom()
+{
+    QJsonObject room;
+    room[QStringLiteral("type")] = QStringLiteral("roomOut");
+
+    sendJson(room);
+}
+
 
 
 
@@ -231,6 +240,7 @@ void Client::jsonReceived(const QJsonObject& docObj)
                 const QJsonValue userRating = user_info_json.value(QLatin1String("rating"));
 
                 user_nickname = usernameVal.toString();
+                
                 user_pic = userPic.toString();
                 user_rating = userRating.toInt();
                 //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
@@ -346,6 +356,12 @@ void Client::jsonReceived(const QJsonObject& docObj)
         //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
         emit userInfoComed(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
     }
+
+    else if (typeVal.toString().compare(QLatin1String("exitRoom"), Qt::CaseInsensitive) == 0) { // A user left the chat
+        // we extract the username of the new user
+        const QJsonValue result = docObj.value(QLatin1String("success"));
+        emit roomWasExit(result.toString());
+    };
 
 }
 

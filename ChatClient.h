@@ -79,8 +79,9 @@ private Q_SLOTS:
     void on_sendButton_clicked();
     void on_attach_files();
     void on_image_clicked(const QString& image_path);
-    void onChatClicked(qint32 chat_id_);
+    void onChatClicked(qint32 chat_id_, const QString& chat_name_);
     void onReactionClick(const Likes& mes_user_likes_);
+    void onExitRoomClicked();
 
 
     //-----AddRoom-----
@@ -103,6 +104,7 @@ private slots:
     void userAvatarUpdated(const DTOUser& dto_user_);
     void userPasswordUpdated(const DTOUser& dto_user_);
     void userDataRecived(const DTOUser& dto_user_);
+    void exitingRoom(const QString& result_);
 
     void likeReceivedServer(const Likes& like_);
 

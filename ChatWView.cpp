@@ -104,7 +104,7 @@ void ChatWView::mouseDoubleClickEvent(QMouseEvent* event)
 			const auto& chat_rects = chat->getChatRoomCurrBox();
 			if (chat_rects.contains(event->pos()))
 			{
-				Q_EMIT chatClicked(chat->getChatId());
+				Q_EMIT chatClicked(chat->getChatId(), chat->getChatRoomName());
 			}
 		}
 	}

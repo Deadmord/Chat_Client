@@ -65,6 +65,7 @@ ChatClient::ChatClient(QWidget* parent)
     //ChatRoomW
     connect(ui->send_button, &QPushButton::clicked, this, &ChatClient::on_sendButton_clicked);
     connect(ui->add_attach_button, &QPushButton::clicked, this, &ChatClient::on_attach_files);
+    connect(ui->chat_exit_button, &QPushButton::clicked, this, &ChatClient::onExitRoomClicked);
 
     //AddRoom
     connect(ui->add_room_cancel_button, &QPushButton::clicked, this, &ChatClient::onCancelClicked);
@@ -78,6 +79,7 @@ ChatClient::ChatClient(QWidget* parent)
     connect(client, &Client::messageReceived, this, &ChatClient::messageReceived);
     connect(client, &Client::chatListRecived, this, &ChatClient::chatListRecived);
     connect(client, &Client::userInfoComed, this, &ChatClient::userDataRecived);
+    connect(client, &Client::roomWasExit, this, &ChatClient::exitingRoom);
     //connect(client, &Client::roomCreated, this, &ChatClient::roomCreated); //TODO MAKE in client
 
     connect(client, &Client::disconnected, this, &ChatClient::disconnectedFromServer); //TODO make a buttton to disconnect
@@ -115,6 +117,7 @@ void ChatClient::on_sign_in_button_clicked()
     ui->profile_start_chating_button->setEnabled(false);
 
     QPixmap pixmap("./images/avatar.png");
+    pixmap.scaled(QSize(200, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     // Set the pixmap to the QLabel
     ui->profile_image_lable->setPixmap(pixmap);
@@ -227,13 +230,15 @@ void ChatClient::onSaveClicked() {
 
 //-----ChatList Page
 
-void ChatClient::onChatClicked(qint32 chat_id_)
+void ChatClient::onChatClicked(qint32 chat_id_, const QString& chat_name_)
 {
     client->enterRoom(chat_id_);
     //client->setRoomNum(chat_id_);
     //TODO send to server new current room
 
     //TODO Delete
+    ui->chat_name_lable->setText(chat_name_);
+
     auto listik = QVariantList{
         QVariant::fromValue<messageItemPtr>
         (
@@ -290,7 +295,7 @@ void ChatClient::onAddChatButtonClicked()
 
 void ChatClient::onProfileClicked()
 {
-    client->askUserInfo();
+    client->askUserInfo(config_data.getConfig().getConfNickname());
 };
 
 //-----Chat Create Page
@@ -422,12 +427,18 @@ void ChatClient::closeEvent(QCloseEvent* event)
     client->disconnectFromHost();
     QMainWindow::closeEvent(event);
 }
+
 void ChatClient::onReactionClick(const Likes& mes_user_likes_) 
 {
     //TODO send to client data
     //TODO delete
     likeReceivedServer({ Like_enum::LIKE, "1", "Lisa"});
 
+}
+
+void ChatClient::onExitRoomClicked()
+{
+    client->exitRoom();
 }
 
 
@@ -536,15 +547,16 @@ void ChatClient::userPasswordUpdated(const DTOUser& dto_user_)
 }
 
 //If client recive UserData, use this function
-void ChatClient::userDataRecived(const DTOUser& dto_user_) {
+void ChatClient::userDataRecived(const DTOUser& dto_user_)
+{
     QSharedPointer<UserItem> user = DTOUser::createUserItemFromDTOUser(dto_user_);
     ui->profile_raiting_text->setText(QString::number(user->getUserRating()));
 
-    
     QPixmap pixmap = user->getUserAvatar().pixmap(QSize(200, 200));
+    pixmap.scaled(QSize(200, 200), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->profile_image_lable->setPixmap(pixmap);
     ui->profile_raiting_text->setText(QString::number(user->getUserRating()));
-
+    ui->stackedWidget->setCurrentIndex(2);
 }
 
 //-----ChatList Page
@@ -647,6 +659,12 @@ void ChatClient::likeReceivedServer(const Likes& like_)
                 , like_.getLikeChatId()
                 , like_.getLikeUserName()) }
     ));
+}
+
+void ChatClient::exitingRoom(const QString& result_) {
+    if (result_ == "success") {
+        client->roomListRequest();
+    }
 }
 
 

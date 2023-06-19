@@ -30,7 +30,7 @@ public Q_SLOTS:
 	void onRowsInserted(const QModelIndex& parent, int first, int last);
 
 Q_SIGNALS:
-	void chatClicked(qint32 chat_id_);
+	void chatClicked(qint32 chat_id_, const QString& chat_name_);
 
 protected:
 	void mouseMoveEvent(QMouseEvent* event) override;

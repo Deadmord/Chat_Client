@@ -54,6 +54,7 @@ signals:
 
     void userJoined(const QString& username);
     void userLeft(const QString& username);
+    void roomWasExit(const QString& result);
 
 public slots:
     void connectToServer(const QHostAddress& address, quint16 port);
@@ -68,7 +69,7 @@ public slots:
     void roomListRequest();
 
     //chatList
-    void askUserInfo();
+    void askUserInfo(const QString& nickname_);
     void enterRoom(quint16 room_number_);
 
     //addChat
@@ -76,6 +77,7 @@ public slots:
 
     //message
     void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_);
+    void exitRoom();
 
     void disconnectFromHost();
 private slots:
