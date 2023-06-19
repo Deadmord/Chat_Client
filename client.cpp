@@ -134,17 +134,17 @@ void Client::enterRoom(quint16 room_number_)
 
 
 //addChat
-void Client::createChat(const ChatItem& chat_)
+void Client::createChat(const chatItemPtr chat_)
 {
-    if (chat_.getChatRoomName().isEmpty() )
+    if (chat_->getChatRoomName().isEmpty() )
         return;
 
     QJsonObject chat_body;
-    chat_body[QStringLiteral("name")] = chat_.getChatRoomName();
-    chat_body[QStringLiteral("description")] = chat_.getChatRoomDescription();
-    chat_body[QStringLiteral("topic")] = chat_.getChatRoomTopicName();
-    chat_body[QStringLiteral("is_private")] = chat_.getChatRoomIsPrivate();
-    chat_body[QStringLiteral("password")] = chat_.getChatRoomPassword();
+    chat_body[QStringLiteral("name")] = chat_->getChatRoomName();
+    chat_body[QStringLiteral("description")] = chat_->getChatRoomDescription();
+    chat_body[QStringLiteral("topic")] = chat_->getChatRoomTopicName();
+    chat_body[QStringLiteral("is_private")] = chat_->getChatRoomIsPrivate();
+    chat_body[QStringLiteral("password")] = chat_->getChatRoomPassword();
 
     QJsonObject user_info;
     user_info[QStringLiteral("type")] = QStringLiteral("createRoom");
