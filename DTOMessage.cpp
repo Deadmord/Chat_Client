@@ -70,7 +70,7 @@ bool DTOMessage::toDTOMessageFromJson(DTOMessage& user_masg_dto_, const QJsonObj
     const QString mediaid = mediaid_val.toString().trimmed();
 
     const QJsonValue rtl_val = user_msg_.value(QLatin1String("rtl"));
-    if (rtl_val.isNull() || !mediaid_val.isBool())
+    if (rtl_val.isNull() || !rtl_val.isBool())
         return false;
     const bool rtl = rtl_val.toBool();
 
