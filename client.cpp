@@ -1,4 +1,5 @@
 #include "client.h"
+#include "ChatItem.h"
 
 Client::Client(QObject* parent)
     : QObject(parent)
@@ -84,17 +85,20 @@ void Client::sendMessage(QSharedPointer<DTOMessage> shp_dto_message_)
     if (shp_dto_message_->getMessageText().isEmpty())
         return; // We don't send empty messages
     // Create the JSON we want to send
+
+    QJsonObject messagebody;
+    messagebody[QStringLiteral("id")] = shp_dto_message_->getMessageId();
+    messagebody[QStringLiteral("parentid")] = "";
+    messagebody[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
+    messagebody[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
+    messagebody[QStringLiteral("text")] = shp_dto_message_->getMessageText();
+    messagebody[QStringLiteral("mediaid")] = "";
+    messagebody[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
+    messagebody[QStringLiteral("likes")] = QJsonObject();
+
     QJsonObject message;
     message[QStringLiteral("type")] = QStringLiteral("message");
-    message[QStringLiteral("id")] = shp_dto_message_->getMessageId();
-    message[QStringLiteral("parentid")] = "";
-    message[QStringLiteral("datetime")] = QDateTime::currentDateTime().toString();
-    message[QStringLiteral("nickname")] = shp_dto_message_->getMessageNickname();
-    message[QStringLiteral("text")] = shp_dto_message_->getMessageText();
-    message[QStringLiteral("mediaid")] = "";
-    message[QStringLiteral("rtl")] = shp_dto_message_->getRTL();
-    message[QStringLiteral("likes")] = QJsonObject();
-
+    message[QStringLiteral("messagebody")] = messagebody;
     sendJson(message);
 }
 
@@ -171,7 +175,7 @@ void Client::jsonReceived(const QJsonObject& docObj)
                 const QJsonValue userRating = user_info_json.value(QLatin1String("rating"));
 
                 user_nickname = usernameVal.toString();
-                // userPic куда base 64 отправл€ть?
+                user_pic = userPic.toString();
                 user_rating = userRating.toInt();
                 //emit loggedIn({ usernameVal.toString(), userRating.toInt(), userPic.toString().toUtf8()}); //dtoUser (base64)
                 emit loggedIn(DTOUser::DTOUser(usernameVal.toString(), userRating.toInt(), userPic.toString()));
@@ -184,14 +188,38 @@ void Client::jsonReceived(const QJsonObject& docObj)
         emit loginError(reasonVal.toString());
     }
 
-    if (typeVal.toString().compare(QLatin1String("roomList"), Qt::CaseInsensitive) == 0) 
+    if (typeVal.toString().compare(QLatin1String("roomList"), Qt::CaseInsensitive) == 0)
     {
         const QJsonArray roomsVal = docObj.value(QLatin1String("rooms")).toArray();
         if (roomsVal.isEmpty());
             return; // rooms empty so we ignored
-        // тут разобрать JSON и записать в List комнат
+        chatList roomItems;
+        for(QJsonValue room: roomsVal)
+        {
+            const QJsonObject roomObj = room.toObject();
+            qint32 id = roomObj.value(QLatin1String("id")).toInt();
+            QString name = roomObj.value(QLatin1String("name")).toString();
+            QString description = roomObj.value(QLatin1String("description")).toString();
+            QString topic = roomObj.value(QLatin1String("topic")).toString();
+            bool is_private = roomObj.value(QLatin1String("is_private")).toBool();
+            roomItems.append(chatItemPtr( new ChatItem( id, name, description, topic, is_private)));
+        }
+        emit chatListRecived(roomItems);
+
     }
 
+    if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0)
+    {
+        const QJsonObject messagebody_val = docObj.value(QLatin1String("messagebody")).toObject();
+        if (messagebody_val.isEmpty())
+            return;
+
+        DTOMessage msg_;
+        if (!DTOMessage::toDTOMessageFromJson(msg_, messagebody_val))
+            return;
+        emit messageReceived(msg_);
+        return;
+    }
     else if (typeVal.toString().compare(QLatin1String("message"), Qt::CaseInsensitive) == 0) { //It's a chat message
         // we extract the text field containing the chat text
         const QJsonValue textId = docObj.value(QLatin1String("id"));
