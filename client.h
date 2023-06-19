@@ -63,6 +63,7 @@ public slots:
     void createUser(QSharedPointer<DTOUser> shp_dto_user_);
     void updateUserPic(QSharedPointer<DTOUser> shp_dto_user_);
     void updateUserPassword(QSharedPointer<DTOUser> shp_dto_user_);
+    void enterRoom(quint16 room_number_);
 
     void disconnectFromHost();
 private slots:
