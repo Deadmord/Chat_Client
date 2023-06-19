@@ -148,7 +148,7 @@ void Client::updateUserPassword(QSharedPointer<DTOUser> shp_dto_user_)
 
 void Client::enterRoom(quint16 room_number_)
 {
-    if (room_number_ != 0)
+    if (room_number_ == 0)
         return;
 
     QJsonObject user;

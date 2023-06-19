@@ -36,12 +36,12 @@ void ChatWView::onChatAdded(const QVariant& new_msg) const
 	model->addChat(new_msg);
 }
 
-void ChatWView::onChatsAdded(const QVariantList& msg_list) const
+void ChatWView::onChatsAdded(const QVariantList& chat_list) const
 {
 	const auto model = qobject_cast<ChatWModel*>(this->model());
 	if (!model)
 		return;
-	model->addChats(msg_list);
+	model->addChats(chat_list);
 }
 
 void ChatWView::onCustomContextMenuRequested(const QPoint& pos)

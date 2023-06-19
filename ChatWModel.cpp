@@ -33,9 +33,9 @@ void ChatWModel::addChats(const QVariantList& new_chat_list_)
         beginInsertRows(QModelIndex(), static_cast<int>(model_chats.size()), static_cast<int>(model_chats.size() + new_chat_list_.size() - 1));
         for (auto const& chat_var : new_chat_list_)
         {
-            if (const auto msg = chat_var.value<chatItemPtr>(); msg)
+            if (const auto chat = chat_var.value<chatItemPtr>(); chat)
             {
-                model_chats.emplaceBack(msg);
+                model_chats.emplaceBack(chat);
             }
         }
         endInsertRows();
