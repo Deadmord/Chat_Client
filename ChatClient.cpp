@@ -287,7 +287,7 @@ void ChatClient::onAddChatButtonClicked()
 
 void ChatClient::onProfileClicked()
 {
-    //TODO ask from Server data about user (in client emit loggedIn)
+    client->askUserInfo();
 };
 
 //-----Chat Create Page
