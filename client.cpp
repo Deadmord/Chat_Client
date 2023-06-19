@@ -147,7 +147,7 @@ void Client::jsonReceived(const QJsonObject& docObj)
     if (typeVal.toString().compare(QLatin1String("roomList"), Qt::CaseInsensitive) == 0)
     {
         const QJsonArray roomsVal = docObj.value(QLatin1String("rooms")).toArray();
-        if (roomsVal.isEmpty());
+        if (roomsVal.isEmpty())
             return; // rooms empty so we ignored
         chatList roomItems;
         for(QJsonValue room: roomsVal)
