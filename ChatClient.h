@@ -67,7 +67,9 @@ private Q_SLOTS:
 
     //-----ProfileW
     void on_start_chatting_clicked();
-    void onSaveEditClicked();
+    void onSaveClicked();
+    void onChangeButtonAvatarClicked();
+    void onChangeButtonPasswordClicked();
 
     //-----ChatListW-----
     void onAddChatButtonClicked();
@@ -90,8 +92,6 @@ private slots:
     void connectedToServer();
     void loginFailed(const QString& reason);
     void loggedIn(const DTOUser& dto_user_);
-    void userCreated(const UserItem& user_);
-    void userEdited(const UserItem& user_);
     void createUserFailed(const QString& reason);
 
     void messageReceived(const DTOMessage& msg_);
@@ -100,6 +100,8 @@ private slots:
     void chatListRecived(const chatList& list_of_mess);
     void topicsComes(const QStringList& topics_);
     void connectedToRoom(const QList<MessageItem>& list_of_mess);
+    void userAvatarUpdated(const UserItem& user_);
+    void userPasswordUpdated(const UserItem& user_);
 
     void likeReceivedServer(const Likes& like_);
 

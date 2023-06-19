@@ -50,6 +50,7 @@ signals:
     void messageReceived(const DTOMessage& msg_);
     void chatListRecived(const chatList& roomItems);
     void errorSignal(QAbstractSocket::SocketError socket_error);
+
     void userJoined(const QString& username);
     void userLeft(const QString& username);
 
@@ -59,6 +60,10 @@ public slots:
     void roomListRequest();
     void entryRoom(quint16 room_number_);
     void sendMessage(QSharedPointer<DTOMessage> shp_dto_message_);
+    void createUser(QSharedPointer<DTOUser> shp_dto_user_);
+    void updateUserPic(QSharedPointer<DTOUser> shp_dto_user_);
+    void updateUserPassword(QSharedPointer<DTOUser> shp_dto_user_);
+
     void disconnectFromHost();
 private slots:
     void onReadyRead();

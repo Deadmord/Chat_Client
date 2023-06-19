@@ -54,6 +54,9 @@ ChatClient::ChatClient(QWidget* parent)
 
     //ProfileW
     connect(ui->profile_start_chating_button, &QPushButton::clicked, this, &ChatClient::on_start_chatting_clicked);
+    connect(ui->profile_save_button, &QPushButton::clicked, this, &ChatClient::onSaveClicked);
+    connect(ui->profile_change_avatar_button, &QPushButton::clicked, this, &ChatClient::onChangeButtonAvatarClicked);
+    connect(ui->profile_change_password_button, &QPushButton::clicked, this, &ChatClient::onChangeButtonPasswordClicked);
 
     //ChatListW
     connect(ui->chatList_add_chat_button, &QPushButton::clicked, this, &ChatClient::onAddChatButtonClicked);
@@ -94,6 +97,7 @@ void ChatClient::onStartAppClicked() {
 //-----LogIn Page
 void ChatClient::on_log_in_button_clicked() 
 {
+    ui->profile_save_button->hide();
     if (!ui->login_nickname_edit->text().isEmpty() && !ui->login_password_edit->text().isEmpty()) {
         client->login(ui->login_nickname_edit->text(), ui->login_password_edit->text());
     }
@@ -103,8 +107,10 @@ void ChatClient::on_log_in_button_clicked()
 
 void ChatClient::on_sign_in_button_clicked()
 {
-    ui->profile_edit_save_button->setText("Save");
+    ui->profile_change_password_button->hide();
+    ui->profile_change_avatar_button->hide();
     ui->profile_start_chating_button->setEnabled(false);
+
     QPixmap pixmap("./images/avatar.png");
 
     // Set the pixmap to the QLabel
@@ -118,33 +124,101 @@ void ChatClient::on_start_chatting_clicked() {
     ui->text_edit->setPlaceholderText("Enter message text here");
     ui->stackedWidget->setCurrentIndex(3);
 
+
     client->roomListRequest();
 }
 
-void ChatClient::onSaveEditClicked() {
-    if (ui->profile_edit_save_button->text() == "Save") {
+void ChatClient::onChangeButtonAvatarClicked()
+{
+    // browse for image files and get a multiple selection
+    auto const& file_names = QFileDialog::getOpenFileNames(this, tr("Select files..."), QDir::homePath(), tr("Images (*.png)"), nullptr, QFileDialog::Options(QFileDialog::ReadOnly));
+    if (file_names.isEmpty())
+    {
+        ui->profile_change_avatar_button->setProperty("attached", {});
+        return;
+    }
+
+
+    if (file_names.size() > 1)
+    {
+        QMessageBox::warning(this, tr("Warning"), tr("You can attach only 1 file!"));
+        return;
+    }
+
+    ui->profile_change_avatar_button->setText(QString("Attached"));
+    ui->profile_change_avatar_button->setProperty("attached", file_names);
+
+    QString selected_file = file_names.first();
+    QFileInfo fileInfo(selected_file);
+    QString format = fileInfo.suffix();
+
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    buffer.open(QIODevice::WriteOnly);
+    QPixmap pixmap(ui->add_attach_button->property("attached").toString());
+    // Save the pixmap as a PNG image
+    pixmap.save(&buffer, "PNG");
+
+    if (format.toLower() == "png") {
+        pixmap.save(&buffer, "PNG");
+    }
+    else {
+        // Handle unsupported format or provide a default format
+        PLOGW << "Unsupported image format";
+        QMessageBox::warning(this, tr("Warning"), tr("Unsupported image format"));
+    }
+
+
+    QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
+        ui->profile_nickname_edit->text(),
+        ui->profile_raiting_text->text().toInt(),
+        QString::fromUtf8(byteArray)
+    );
+    client->updateUserPic(dto_user);
+
+}
+
+void ChatClient::onChangeButtonPasswordClicked()
+{
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    QPixmap pixmap(ui->profile_image_lable->pixmap());
+    pixmap.save(&buffer, "PNG");
+
+    if (!ui->profile_password_edit->text().isEmpty()) {
+        QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
+            ui->profile_nickname_edit->text(),
+            ui->profile_raiting_text->text().toInt(),
+            QString::fromUtf8(byteArray),
+            ui->profile_password_edit->text()
+        );
+
+        client->updateUserPassword(dto_user);
+    }
+    else {
+        QMessageBox::warning(this, "Warning", "Fill all fildes");
+    }
+}
+
+void ChatClient::onSaveClicked() {
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    QPixmap pixmap(ui->profile_image_lable->pixmap());
+    pixmap.save(&buffer, "PNG");
+
+    if (!ui->profile_nickname_edit->text().isEmpty() && !ui->profile_nickname_edit->text().isEmpty()) {
         //TODO send to client changed info
         QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
             ui->profile_nickname_edit->text(),
             ui->profile_raiting_text->text().toInt(),
-            "",
+            QString::fromUtf8(byteArray),
             ui->profile_password_edit->text()
         );
-        
-        //->dto
-        //client->
+        client->createUser(dto_user);
     }
     else {
-        //TODO send to client info about new user
-        //->dto
-        QSharedPointer<DTOUser> dto_user = QSharedPointer<DTOUser>::create(
-            ui->profile_nickname_edit->text(),
-            ui->profile_raiting_text->text().toInt(),
-            "",
-            ui->profile_password_edit->text()
-        );
+        QMessageBox::warning(this, "Warning", "Fill all fildes");
 
-        //client->
     }
 }
 
@@ -263,16 +337,26 @@ void ChatClient::on_sendButton_clicked()
     static auto ID = 0ULL;
     ++ID;
     auto id = QUuid::createUuid();
+
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    buffer.open(QIODevice::WriteOnly);
+    QPixmap pixmap(ui->add_attach_button->property("attached").toString());
+    // Save the pixmap as a PNG image
+    pixmap.save(&buffer, "JPEG");
     
-    QString nickname = "Anton";
-    auto text = ui->text_edit->toPlainText();
-    bool is_RTL = IsCurrentInputLanguageRTL();
     listLikes listlikes;
     QString message_image_id;
-    QPixmap pixmap("./images/avatar.png");
-    QIcon icon(pixmap);
+
+
     //TODO send to server full data 
-    QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(id.toString(), nickname, text, is_RTL, listlikes, message_image_id);
+    QSharedPointer<DTOMessage> dto_message = QSharedPointer<DTOMessage>::create(
+        id.toString(), 
+        config_data.getConfig().getConfNickname(),
+        ui->text_edit->toPlainText(),
+        IsCurrentInputLanguageRTL(),
+        listlikes, 
+        message_image_id);
     client->sendMessage(dto_message);
     //messageItem -> dto
 
@@ -378,7 +462,7 @@ void ChatClient::loggedIn(const DTOUser& dto_user_)
 {
     config_data.getConfig().saveConfig(ui->login_nickname_edit->text(), ui->login_password_edit->text());
 
-    ui->profile_edit_save_button->setText("Edit");
+    ui->profile_save_button->hide();
     ui->profile_start_chating_button->setEnabled(true);
 
     //Now they empty, becouse from server nothing was comming
@@ -405,15 +489,6 @@ void ChatClient::loggedIn(const DTOUser& dto_user_)
 
 //-----Profile Page
 //If client create a user correctly, use this function
-void ChatClient::userCreated(const UserItem& user_) {
-    config_data.getConfig().saveConfig(ui->login_nickname_edit->text(), ui->login_password_edit->text());
-
-    //TODO add about iqon
-    ui->profile_edit_save_button->setText("Edit");
-    ui->profile_nickname_edit->setEnabled(false);
-
-    PLOGI << "User" << user_.getUserNickname() << "created correctly";
-}
 
 //If client make a mistake, when create a user, use this function
 void ChatClient::createUserFailed(const QString& reason) {
@@ -425,16 +500,23 @@ void ChatClient::createUserFailed(const QString& reason) {
     PLOGW << "Creating user finish with error" << reason;
 }
 
-//If client made changes with his profile, use this function
-void ChatClient::userEdited(const UserItem& user_) {
-    config_data.getConfig().saveConfig(ui->profile_nickname_edit->text(), ui->profile_password_edit->text());
-
-    //TODO add about iqon
-    ui->profile_edit_save_button->setText("Edit");
-    ui->profile_nickname_edit->setEnabled(false);
-
-    PLOGI << "User" << user_.getUserNickname() << "changed correctly";
+//If client change Avatar correctly, use this function
+void ChatClient::userAvatarUpdated(const UserItem& user_)
+{
+    ui->profile_change_avatar_button->setText("Change Avatar");
+    QMessageBox::information(this, "Success", "Avatar was changed");
+    PLOGI << "Avatar " << user_.getUserNickname() << " changed correctly";
 }
+
+//If client change Password correctly, use this function
+void ChatClient::userPasswordUpdated(const UserItem& user_)
+{
+    config_data.getConfig().saveConfig(user_.getUserNickname(), ui->profile_password_edit->text());
+    ui->profile_change_avatar_button->setText("Change password");
+    QMessageBox::information(this, "Success", "Password was changed");
+    PLOGI << "Password " << user_.getUserNickname() << " changed correctly";
+}
+
 
 //-----ChatList Page
 // 
@@ -473,6 +555,7 @@ void ChatClient::connectedToRoom(const QList<MessageItem>& list_of_mess)
 {
  //TODO ask client for sending n-messages   
 }
+
 
 //If new mess recieved (download list of messages)
 void ChatClient::messageListReceived(const QList<MessageItem>& list_of_mess)
